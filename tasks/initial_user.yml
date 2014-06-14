@@ -1,0 +1,41 @@
+---
+- hosts: all
+  remote_user: root
+
+  vars:
+    local_user: "{{ lookup('env', 'USER') }}"
+
+  vars_prompt:
+  - name: "user_password"
+    prompt: "Enter password for your user"
+    private: yes
+    encrypt: "sha512_crypt"
+    confirm: yes
+    salt_size: 7
+
+  tasks:
+    - name: "Create local user"
+      user:
+        name: "{{ local_user }}"
+        shell: "/bin/bash"
+        append: "yes"
+        groups: "sudo"
+        password: "{{ user_password }}"
+        state: "present"
+
+    - name: "Add authorized_key for local user"
+      authorized_key:
+        user: "{{ local_user }}"
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+    - name: Disallow root SSH access
+      action: lineinfile dest=/etc/ssh/sshd_config regexp="^PermitRootLogin" line="PermitRootLogin no" state=present
+      notify: Restart ssh
+
+    - name: Disallow password authentication
+      action: lineinfile dest=/etc/ssh/sshd_config regexp="^PasswordAuthentication" line="PasswordAuthentication no" state=present
+      notify: Restart ssh
+
+  handlers:
+  - name: Restart ssh
+    action: service name=ssh state=restarted

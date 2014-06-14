@@ -1,0 +1,25 @@
+---
+- name: "Check if app user exists"
+  shell: "getent passwd {{app}} && echo 'yes' || echo 'no'"
+  register: app_user_exists
+  ignore_errors: True
+
+
+- debug: var=app_user_exists.stdout
+
+- name: "Create app user"
+  user:
+    name: "{{app}}"
+    shell: "/bin/bash"
+    groups: "rvm"
+    append: "yes"
+    state: "present"
+  when: '"no" in app_user_exists.stdout'
+  sudo: yes
+
+- name: "Add deployment key for app user"
+  authorized_key:
+    user: "{{app}}"
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+  when: '"no" in app_user_exists.stdout'
+  sudo: yes

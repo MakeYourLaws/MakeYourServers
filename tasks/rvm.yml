@@ -1,0 +1,41 @@
+---
+- name: Check if rvm installed
+  shell: "ls /usr/local/rvm/bin/rvm && echo 'yes' || echo 'no'"
+  register: rvm_installed
+
+- debug: var=rvm_installed.stdout
+
+- name: Install git
+  apt: pkg=git state=present update_cache=yes
+  sudo: yes
+
+- name: Install rvm
+  shell: '\curl -sSL https://get.rvm.io | bash -s stable'
+  sudo: yes
+  when: '"no" in rvm_installed.stdout'
+
+- name: Ensure rvm always available in path
+  lineinfile:
+    state: present
+    dest: /etc/bash.bashrc
+    line: 'type rvm >/dev/null 2>/dev/null || echo ${PATH} | GREP_OPTIONS="" \grep "/usr/local/rvm/bin" > /dev/null || export PATH="${PATH}:/usr/local/rvm/bin"'
+    insertbefore: BOF
+    regexp: "^type rvm"
+  sudo: True
+
+- name: Install rvm requirements
+  shell: rvm requirements
+  sudo: yes
+
+- name: Fix rvm permissions
+  shell: rvm fix-permissions
+  sudo: yes
+
+- name: Update rvm
+  shell: rvm get stable
+  sudo: yes
+  when: '"yes" in rvm_installed.stdout'
+
+- name: Ensure local user is in rvm group
+  user: "name={{local_user}} groups=rvm append=yes"
+  sudo: yes

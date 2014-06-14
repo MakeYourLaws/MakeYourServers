@@ -1,0 +1,38 @@
+---
+- hosts: all
+
+  vars_prompt:
+  - name: "longview_api_key"
+    prompt: "Enter longview API key"
+    private: yes
+
+  tasks:
+  - name: Update longview distribution list
+    lineinfile:
+      state: present
+      create: yes
+      dest: /etc/apt/sources.list.d/longview.list
+      line: "deb http://apt-longview.linode.com/ {{ansible_distribution_release}} main"
+      regexp: "^.*"
+    sudo: True
+
+  - name: Get Linode GPG key
+    command: wget https://apt-longview.linode.com/linode.gpg -O /etc/apt/trusted.gpg.d/linode.gpg
+    sudo: True
+
+  - name: Add Linode API key
+    lineinfile:
+      state: present
+      create: yes
+      dest: /etc/linode/longview.key
+      line: "{{longview_api_key}}"
+      regexp: "^.*"
+    sudo: True
+
+  - name: Update APT package cache
+    action: apt update_cache=yes
+    sudo: True
+
+  - name: Install linode longview
+    action: "apt pkg=linode-longview state=installed"
+    sudo: True

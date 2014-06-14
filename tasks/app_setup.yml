@@ -1,0 +1,11 @@
+---
+- hosts: all
+
+  vars:
+    local_user: "{{ lookup('env', 'USER') }}"
+    app: "makeyourlaws"
+
+  tasks:
+    - include: rvm.yml
+    - include: app_user.yml
+    - include: app.yml

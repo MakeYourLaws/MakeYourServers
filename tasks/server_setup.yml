@@ -1,0 +1,10 @@
+---
+- hosts: all
+
+  tasks:
+  - include: apt.yml
+
+  # handlers:
+  # - include: handlers/handlers.yml
+
+

@@ -1,0 +1,32 @@
+---
+- name: Update APT package cache
+  action: apt update_cache=yes
+  sudo: True
+
+- name: Upgrade APT to the lastest packages
+  action: apt upgrade=safe
+  sudo: True
+  register: upgraded_packages
+
+- debug: var=upgraded_packages.stdout_lines
+
+- name: Install basics
+  action: "apt pkg={{ item }} state=installed"
+  sudo: True
+  with_items:
+    - build-essential
+    - gzip
+    - fail2ban
+    - clamav
+    - iftop
+    - ntp
+    - git
+
+
+- name: Get manually installed files
+  shell: ( gunzip -c /var/log/apt/history.log.*.gz || echo '') | cat /var/log/apt/history.log - | grep -E " install " | sed 's/^.* install //' | tr " " "\n" | grep -v ^- | sort | uniq
+  register: manual_apt_installs
+
+- debug: var=manual_apt_installs.stdout_lines
+
+- debug: var=ansible_distribution_release
