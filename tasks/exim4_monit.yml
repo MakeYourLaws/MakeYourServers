@@ -1,0 +1,21 @@
+---
+- name: Symlink exim monit files
+  file:
+    src: "/etc/monit/monitrc.d/{{item}}"
+    dest: "/etc/monit/conf.d/{{item}}"
+    state: link
+    owner: root
+    group: root
+  sudo: yes
+  tags: exim4
+  with_items:
+    - exim
+    - sasl
+    - opendkim
+
+- name: Reload monit
+  service:
+    name: monit
+    state: reloaded
+  sudo: yes
+  tags: exim4

@@ -1,0 +1,2 @@
+umask u=rwx,g=rwx,o=rx
+rvm_auto_reload_flag=1

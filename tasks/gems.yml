@@ -1,0 +1,12 @@
+---
+- debug:
+    msg: "hostvars: {{hostvars}}"
+- debug:
+    msg: "environment={{environment}}"
+
+- name: Install rmate
+  gem:
+    name: rmate
+    state: latest
+    user_install: no
+  sudo: yes

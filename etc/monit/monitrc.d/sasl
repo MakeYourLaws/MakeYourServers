@@ -1,0 +1,16 @@
+check process saslauthd with pidfile /var/run/saslauthd/saslauthd.pid
+       group mail
+       start program = "/usr/sbin/service saslauthd start"
+       stop  program = "/usr/sbin/service saslauthd stop"
+       if failed unix /var/run/saslauthd/mux then restart
+       if 5 restarts within 5 cycles then timeout
+       depends on saslauthd_bin
+       depends on saslauthd_rc
+
+check file saslauthd_bin with path /usr/sbin/saslauthd
+       group mail
+       include /etc/monit/templates/rootbin
+
+check file saslauthd_rc with path /etc/init.d/saslauthd
+       group mail
+       include /etc/monit/templates/rootbin

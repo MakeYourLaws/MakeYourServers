@@ -2,9 +2,21 @@
 - hosts: all
 
   tasks:
-  - include: apt.yml
+  # - include: host.yml
+  # - include: apt.yml
+  # - include: basics.yml
+  # - include: rvm.yml
+  # - include: ruby.yml
+  # - include: gems.yml
+  # - include: certs.yml
+  - include: exim4.yml
+  # - include: monit.yml
+  - include: exim4_monit.yml
+  # - include: smartmontools.yml # only on non-virtual server
+  # - include: mysql.yml
+  # - include: redis.yml
+  # - include: nginx.yml
+  # - include: puma.yml
 
   # handlers:
   # - include: handlers/handlers.yml
-
-

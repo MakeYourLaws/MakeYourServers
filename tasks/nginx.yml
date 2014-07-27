@@ -1,20 +1,99 @@
+- name: Check if nginx signing key exists
+  shell: "apt-key list | grep nginx && echo 'yes' || echo 'no'"
+  register: nginx_signing_key
+  sudo: yes
+  tags: nginx
+
+- name: Add nginx signing key
+  shell: "curl http://nginx.org/keys/nginx_signing.key | apt-key add -"
+  when: '"no" in nginx_signing_key.stdout'
+  sudo: yes
+  tags: nginx
+
+- name: Make nginx group
+  group:
+    name: nginx
+    system: yes
+    state: present
+  sudo: yes
+
+- name: Make nginx user
+  user:
+    name: nginx
+    createhome: no
+    group: nginx
+    shell: /bin/false
+    system: yes
+    state: present
+  sudo: yes
+
+- name: Add nginx.list
+  copy:
+    src: ../etc/apt/sources.list.d/nginx.list
+    dest: /etc/apt/sources.list.d/nginx.list
+    owner: root
+    group: root
+    mode: 0644
+  tags: nginx
+  sudo: yes
+
 - name: Install nginx
-  apt: pkg=nginx state=latest
+  apt:
+    pkg: nginx
+    state: latest
+  sudo: yes
+
+- name: Add nginx.conf
+  copy:
+    src: ../etc/nginx/nginx.conf
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: 0644
+  tags: nginx
+  sudo: yes
 
 - name: Remove the default app
-  command: rm -rf /etc/nginx/sites-enabled/default
+  shell: "[[ -f /etc/nginx/conf.d/default.conf ]] && rm /etc/nginx/conf.d/default.conf"
+  sudo: yes
 
-- name: Remove the app's config, if exists
-  command: rm -rf /etc/nginx/sites-enabled/default
+- name: Add site directories
+  file:
+    path: /etc/nginx/{{item}}
+    state: directory
+  with_items:
+    - sites-available
+    - sites-enabled
+  tags: nginx
+  sudo: yes
 
-- name: Remove the app's symlink, if exists
-  command: rm -rf /etc/nginx/sites-enabled/spree
+- name: Add site configs
+  copy:
+    src: "../etc/nginx/sites-available/{{item}}.conf"
+    dest: "/etc/nginx/sites-available/{{item}}.conf"
+    owner: root
+    group: root
+    mode: 0644
+  tags: nginx
+  sudo: yes
+  with_items:
+    - mylfrontend_tor
+    - mylfrontend
+    - mylwiki
 
-- name: Configure nginx for the app
-  template: src=etc_nginx_sites-available_spree.conf.j2 dest=/etc/nginx/sites-available/spree group=www-data owner=www-data force=yes
+- name: Symlink nginx monit
+  file:
+    src: /etc/monit/monitrc.d/nginx
+    dest: /etc/monit/conf.d/nginx
+    state: link
+    owner: root
+    group: root
+  sudo: yes
+  tags: nginx
 
-- name: Enable the app
-  command: ln -s /etc/nginx/sites-available/spree /etc/nginx/sites-enabled/spree
-
-- name: Restart nginx
-  action: service name=nginx state=restarted
+- name: Reload monit
+  service:
+    name: monit
+    state: reloaded
+  sudo: yes
+  tags: nginx

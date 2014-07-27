@@ -1,0 +1,28 @@
+---
+- name: Install basics
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+  sudo: True
+  with_items:
+    - build-essential
+    - gzip
+    - fail2ban
+    - clamav
+    - iftop
+    - ntp
+    - git
+    - acpid
+
+- name: Ensure permissions on system init.d files
+  file:
+    path: "/etc/init.d/{{item}}"
+    mode: 0755
+  sudo: yes
+  with_items:
+    - atd
+    - acpid
+    # - cron # symlink to /lib/init/upstart-job
+    - ntp
+    - ssh
+    - rsyslog

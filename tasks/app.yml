@@ -1,17 +1,4 @@
 ---
-- name: Check if rbx-2.2.7 present
-  shell: 'rvm list | grep "rbx-2.2.7" && echo "yes" || echo "no"'
-  sudo: True
-  register: rbx227_installed
-
-- name: Install rbx-2.2.7 if not present
-  shell: rvm install rbx-2.2.7
-  sudo: True
-  when: '"no" in rbx227_installed.stdout'
-
-- name: Make rbx-2.2.7 default
-  shell: rvm alias create default rbx-2.2.7
-  sudo: True
 
 # - name: install default gems
 #   action: rvm

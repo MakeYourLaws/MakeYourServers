@@ -1,0 +1,19 @@
+check process exim with pidfile /run/exim4/exim.pid
+   group mail
+   start program = "/usr/sbin/service exim start"
+   stop  program = "/usr/sbin/service exim stop"
+   if failed port 25 protocol smtp then restart
+   if 5 restarts within 5 cycles then timeout
+   depends on exim_bin
+   depends on exim_rc
+
+check file exim_bin with path /usr/sbin/exim4
+   group mail
+   if failed checksum then unmonitor
+   if failed permission 4755 then unmonitor
+   if failed uid root then unmonitor
+   if failed gid root then unmonitor
+
+check file exim_rc with path /etc/init.d/exim4
+   group mail
+   include /etc/monit/templates/rootbin

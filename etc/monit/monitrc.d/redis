@@ -1,0 +1,11 @@
+check process redis with pidfile /run/redis.pid
+  start program = "/usr/sbin/service redis-server start"
+  stop program = "/usr/sbin/service redis-server stop"
+  if failed host 127.0.0.1 port 6379 then restart
+  if 5 restarts within 5 cycles then timeout
+  if failed port 6379
+    send "SET monit_test 7\r\n"
+    expect "OK"
+    send "EXISTS monit_test\r\n"
+    expect ":1"
+  then alert

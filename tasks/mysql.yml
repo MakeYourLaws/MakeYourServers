@@ -1,33 +1,85 @@
-- name: Install PostgreSQL dependencies
-  action: apt pkg={{item}} state=latest
+---
+- name: Install mysql
+  apt:
+    pkg: "{{item}}"
+    state: latest
   with_items:
-    - python-pycurl
-    - python-psycopg2
-
-- name: Add PostgreSQL repo key
-  apt_key: url=http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc
-
-- name: Add PostgreSQL repo
-  apt_repository: repo='deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main'
-
-- name: Install PostgreSQL
-  apt: pkg=postgresql-9.3 state=latest update_cache=true
-
-- name: Copy valid pg_hba.conf
-  template: src=pg_hba.conf.j2 dest=/etc/postgresql/9.3/main/pg_hba.conf
-
-- name: Copy valid postgresql.conf
-  template: src=postgresql.conf.j2 dest=/etc/postgresql/9.3/main/postgresql.conf
-
-- name: Restart PostgreSQL
-  command: service postgresql restart
-
-- name: create the postgresql user for application
-  postgresql_user: name=deploy
+    - mysql-server
+    - mysql-client
+    - python-mysqldb
+    - libmysqlclient-dev
   sudo: yes
-  sudo_user: postgres
 
-- name: create the postgresql database for application
-  postgresql_db: name=app_{{app_name}} owner=deploy state=present
+- name: Add my.cnf
+  copy:
+    src: ../etc/mysql/my.cnf
+    dest: /etc/mysql/my.cnf
+    owner: root
+    group: root
+    mode: 0600
+  tags: mysql
   sudo: yes
-  sudo_user: postgres
+
+- name: Start the MySQL service
+  service:
+    name: mysql
+    state: started
+  sudo: yes
+
+- name: Update mysql root password
+  mysql_user:
+    name: root
+    host: "{{item}}"
+    password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
+    check_implicit_admin: yes
+    login_user: root
+    login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
+  with_items:
+    - 127.0.0.1
+    - ::1
+    - localhost
+  sudo: yes
+
+- name: Remove the test database
+  mysql_db:
+    name: test
+    state: absent
+    login_user: root
+    login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
+  sudo: yes
+
+- name: Ensure anonymous users are not in the database
+  mysql_user:
+    user: ''
+    host: "{{item}}"
+    state: absent
+    login_user: root
+    login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
+  with_items:
+    - 127.0.0.1
+    - ::1
+    - localhost
+  sudo: yes
+
+- name: Restart the MySQL service
+  service:
+    name: mysql
+    state: restarted
+  sudo: yes
+
+- name: Symlink mysql monit
+  file:
+    src: /etc/monit/monitrc.d/mysql
+    dest: /etc/monit/conf.d/mysql
+    state: link
+    owner: root
+    group: root
+  sudo: yes
+  tags: mysql
+
+- name: Reload monit
+  service:
+    name: monit
+    state: reloaded
+  sudo: yes
+  tags: mysql

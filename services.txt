@@ -1,0 +1,31 @@
+old server:
+
+binfmt-support
+courier-authdaemon
+cryptdisks
+cryptdisks-early
+cryptdisks-enable
+cryptdisks-udev
+makeyourlaws_resque
+makeyourlaws_resque_scheduler
+minissdpd
+newrelic-sysmond
+openfire
+php5-fpm
+remote_syslog
+tor
+unattended-upgrades
+x11-common
+
+
+new server:
+
+apport
+console-setup
+dns-clean
+friendly-recovery
+irqbalance
+pppd-dns
+resolvconf
+setvtrgb
+sysstat

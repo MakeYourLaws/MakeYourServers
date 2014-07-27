@@ -1,0 +1,25 @@
+---
+- name: Check latest rbx version
+  shell: 'rvm list known | grep "rbx\[-" | sed -E "s/[^0-9.]//g"'
+  register: latest_rbx_version
+
+- name: Check current rbx version
+  shell: "rvm list | grep '* rbx' | cut  -d ' ' -f 2 | sed -E 's/[^0-9.]//g'"
+  register: current_rbx_version
+
+- debug: var=latest_rbx_version.stdout
+- debug: var=current_rbx_version.stdout
+
+- name: Install latest rbx version
+  shell: "rvm install rbx-{{latest_rbx_version.stdout}}"
+  sudo: True
+  when: latest_rbx_version.stdout != current_rbx_version.stdout
+
+- name: Copy gemset over to new version
+  shell: "rvm gemset copy rbx-{{current_rbx_version.stdout}} rbx-{{latest_rbx_version.stdout}}"
+  when: current_rbx_version.stdout.find('.') != -1 and latest_rbx_version.stdout != current_rbx_version.stdout
+
+- name: Make latest rbx default
+  shell: "rvm alias create default rbx-{{latest_rbx_version.stdout}}"
+  sudo: True
+  when: latest_rbx_version.stdout.find('.') != -1

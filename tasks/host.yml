@@ -1,0 +1,50 @@
+---
+# - debug:
+#     msg: "hostvars: {{hostvars}}"
+# - debug:
+#     msg: "group_names: {{group_names}}"
+# - debug:
+#     msg: "groups={{groups}}"
+# - debug:
+#     msg: "environment={{environment}}"
+- debug:
+    msg: "inventory_hostname: {{inventory_hostname}}"
+# - debug:
+#     msg: "inventory_hostname_short={{inventory_hostname_short}}"
+# - debug:
+#     msg: "play_hosts={{play_hosts}}"
+# - debug:
+#     msg: "inventory_dir={{inventory_dir}}"
+# - debug:
+#     msg: "inventory_file={{inventory_file}}"
+
+- name: Update hostname
+  hostname: "name={{inventory_hostname}}"
+  sudo: yes
+
+- name: Ensure hostname in /etc/hosts
+  lineinfile:
+    state: present
+    create: yes
+    dest: /etc/hosts
+    line: "{{ansible_eth0.ipv4.address}} {{inventory_hostname}}.makeyourlaws.org {{inventory_hostname}}"
+    regexp: "^.*{{inventory_hostname}}$"
+  sudo: yes
+
+- name: Set locales
+  copy:
+    src: ../etc/default/locale
+    dest: /etc/default/locale
+    owner: root
+    group: root
+    mode: 0644
+  sudo: yes
+
+- name: Set root mailing aliases
+  copy:
+    src: ../etc/aliases
+    dest: /etc/aliases
+    owner: root
+    group: root
+    mode: 0644
+  sudo: yes

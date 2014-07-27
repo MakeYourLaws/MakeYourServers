@@ -1,0 +1,4 @@
+DKIM_CANNON = relaxed
+DKIM_DOMAIN = $sender_address_domain
+DKIM_PRIVATE_KEY = CONFDIR/narn.dkim.private.key
+DKIM_SELECTOR = narn

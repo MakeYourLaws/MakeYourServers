@@ -1,0 +1,103 @@
+---
+- name: Make Redis group
+  group:
+    name: redis
+    system: yes
+    state: present
+  sudo: yes
+
+- name: Make Redis user
+  user:
+    name: redis
+    createhome: no
+    group: redis
+    shell: /bin/false
+    system: yes
+    state: present
+  sudo: yes
+
+- name: Make Redis directories
+  file:
+    path: "{{item}}"
+    owner: redis
+    group: redis
+    state: directory
+    mode: 0755
+  sudo: yes
+  with_items:
+    - "/etc/redis"
+    - "/var/redis"
+
+- name: Install pycurl package in order to use the apt_repository module
+  apt:
+    pkg: python-pycurl
+    state: present
+  sudo: yes
+
+- name: Install redis PPA
+  apt_repository:
+    repo: 'ppa:rwky/redis'
+  sudo: yes
+
+- name: Install redis
+  apt:
+    pkg: redis-server
+    update_cache: yes
+    state: latest
+  sudo: yes
+
+- name: Set overcommit_memory to 1
+  sysctl:
+    name: vm.overcommit_memory
+    value: "1"
+    state: present
+  sudo: yes
+
+- name: Add redis.conf
+  copy:
+    src: "../etc/redis/redis.conf"
+    dest: "/etc/redis/redis.conf"
+    owner: redis
+    group: redis
+    mode: 0664
+  tags: redis
+  sudo: yes
+
+- name: Remove default redis init
+  file:
+    path: /etc/init/redis-server.conf
+    state: absent
+  sudo: yes
+  tags: redis
+
+- name: Add redis init.d
+  copy:
+    src: ../etc/init.d/redis
+    dest: /etc/init.d/redis
+    owner: root
+    group: root
+    mode: 0755
+  tags: redis
+  sudo: yes
+
+- name: Install redis init.d
+  shell: update-rc.d redis defaults
+  sudo: yes
+  tags: redis
+
+- name: Symlink redis monit
+  file:
+    src: /etc/monit/monitrc.d/redis
+    dest: /etc/monit/conf.d/redis
+    state: link
+    owner: root
+    group: root
+  sudo: yes
+  tags: redis
+
+- name: Reload monit
+  service:
+    name: monit
+    state: reloaded
+  sudo: yes
+  tags: redis

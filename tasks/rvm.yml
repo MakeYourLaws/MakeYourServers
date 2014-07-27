@@ -6,7 +6,16 @@
 - debug: var=rvm_installed.stdout
 
 - name: Install git
-  apt: pkg=git state=present update_cache=yes
+  apt: pkg=git state=latest update_cache=yes
+  sudo: yes
+
+- name: Install rvmrc
+  copy:
+    src: ../etc/rvmrc
+    dest: /etc/rvmrc
+    owner: root
+    group: rvm
+    mode: 0644
   sudo: yes
 
 - name: Install rvm
@@ -31,11 +40,65 @@
   shell: rvm fix-permissions
   sudo: yes
 
-- name: Update rvm
+- name: Get rvm version
+  shell: 'rvm -v | grep -Eo "rvm (.*) \(stable\)" | grep -Eo "[0-9.]+"'
+  register: rvm_version
+
+- name: Get latest rvm version
+  shell: curl https://raw.githubusercontent.com/wayneeseguin/rvm/stable/VERSION
+  register: latest_rvm_version
+
+- debug: var=rvm_version.stdout
+- debug: var=latest_rvm_version.stdout
+
+- name: Update rvm if needed
   shell: rvm get stable
   sudo: yes
-  when: '"yes" in rvm_installed.stdout'
+  when: '"yes" in rvm_installed.stdout and latest_rvm_version.stdout != rvm_version.stdout'
+
+- name: Get rvm version
+  shell: 'rvm -v | grep -Eo "rvm (.*) \(stable\)" | grep -Eo "[0-9.]+"'
+  register: new_rvm_version
+
+- debug: var=new_rvm_version.stdout
+
+- name: Symlink rvm defaults to path
+  file:
+    src: /usr/local/rvm/rubies/default/bin/{{item}}
+    dest: /usr/local/bin/{{item}}
+    state: link
+    owner: root
+    group: rvm
+  with_items:
+    - erb
+    - gem
+    - irb
+    - rake
+    - rbx
+    - ri
+    - ruby
+    - testrb
+  sudo: yes
+
+- name: Get gem version
+  shell: gem -v
+  register: gem_version
+
+- debug: var=gem_version.stdout
+
+- name: Update rubygems
+  shell: gem update --system
+  sudo: yes
+
+- name: Get gem version
+  shell: gem -v
+  register: gem_version
+
+- debug: var=gem_version.stdout
 
 - name: Ensure local user is in rvm group
-  user: "name={{local_user}} groups=rvm append=yes"
+  user:
+    name: "{{ lookup('env', 'USER') }}"
+    groups: rvm
+    append: yes
   sudo: yes

@@ -1,0 +1,42 @@
+---
+# Smartmontools is only for non-virtual drives. For now we're on a virtual server.
+
+- name: Install smartmontools
+  apt:
+    pkg: smartmontools
+    state: latest
+  sudo: True
+
+- name: Ensure permissions on smartmontools init.d file
+  file:
+    path: "/etc/init.d/smartmontools"
+    mode: 0755
+  sudo: yes
+
+- name: Copy smartmon config
+  copy:
+    src: "..{{item}}"
+    dest: "{{item}}"
+    owner: root
+    group: root
+    mode: 0644
+  sudo: yes
+  with_items:
+    - "/etc/smartd.conf"
+    - "/etc/default/smartmontools"
+
+
+- name: Symlink smartmontools monit
+  file:
+    src: /etc/monit/monitrc.d/smartmontools
+    dest: /etc/monit/conf.d/smartmontools
+    state: link
+    owner: root
+    group: root
+  sudo: yes
+
+- name: Reload monit
+  service:
+    name: monit
+    state: reloaded
+  sudo: yes

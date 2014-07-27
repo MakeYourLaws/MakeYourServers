@@ -1,0 +1,86 @@
+---
+- name: Install exim4
+  apt:
+    pkg: "{{item}}"
+    state: latest
+  with_items:
+    - exim4
+    - sasl2-bin
+    - opendkim
+    - opendkim-tools
+  sudo: yes
+  tags: exim4
+
+- name: Add exim4 config
+  copy:
+    src: "../etc/exim4/{{item}}"
+    dest: "/etc/exim4/{{item}}"
+    owner: root
+    group: Debian-exim
+    mode: 0640
+  tags: exim4
+  sudo: yes
+  with_items:
+    - conf.d/main/00_localmacros
+    - conf.d/main/01_exim4-config_listmacrosdefs
+    - conf.d/main/02_exim4-config_options
+    - conf.d/main/03_exim4-config_tlsoptions
+    - conf.d/router/200_exim4-config_primary
+    - conf.d/router/500_exim4-config_hubuser
+    - update-exim4.conf.conf
+
+- name: Add saslauthd default
+  copy:
+    src: "..{{item}}"
+    dest: "{{item}}"
+    owner: root
+    group: root
+    mode: 0644
+  tags: exim4
+  sudo: yes
+  with_items:
+    - /etc/opendkim.conf
+    - /etc/default/saslauthd
+
+- name: Add exim4 certs
+  copy:
+    src: "{{item}}"
+    dest: /etc/exim4/
+    owner: root
+    group: Debian-exim
+    mode: 0640
+  tags: exim4
+  sudo: yes
+  with_fileglob:
+    - ~/myl_sensitive/server/etc/exim4/*
+
+- name: Make /etc/mail dir
+  file:
+    path: "/etc/mail/"
+    state: directory
+    owner: root
+    group: root
+  sudo: yes
+  tags: exim4
+
+- name: Symlink dkim key
+  file:
+    src: "/etc/exim4/narn.dkim.private.key"
+    dest: "/etc/mail/dkim.key"
+    state: link
+    owner: root
+    group: root
+  sudo: yes
+  tags: exim4
+
+- name: Add exim to SASL group
+  user:
+    name: Debian-exim
+    group: sasl
+  sudo: yes
+  tags: exim4
+
+- name: Run update-exim4.conf
+  shell: "update-exim4.conf"
+  sudo: yes
+  tags: exim4

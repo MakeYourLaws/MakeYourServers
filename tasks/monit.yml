@@ -1,0 +1,55 @@
+---
+- name: Install monit
+  apt:
+    pkg: monit
+    state: latest
+  sudo: yes
+  tags: monit
+
+- name: Add monitrc
+  copy:
+    src: ../etc/monit/monitrc
+    dest: /etc/monit/monitrc
+    owner: root
+    group: root
+    mode: 0600
+  tags: monit
+  sudo: yes
+
+- name: Add monitrc.d conf files
+  copy:
+    src: "{{item}}"
+    dest: /etc/monit/monitrc.d/
+    owner: root
+    group: root
+    mode: 0644
+  tags: monit
+  sudo: yes
+  with_fileglob:
+    - ../etc/monit/monitrc.d/*
+
+- name: Symlink system monits
+  file:
+    src: /etc/monit/monitrc.d/{{item}}
+    dest: /etc/monit/conf.d/{{item}}
+    state: link
+    owner: root
+    group: root
+  with_items:
+    - acpid
+    - at
+    - cron
+    # - mdadm
+    - ntp
+    - openssh-server
+    # - pdns-recursor
+    # - postfix
+    - rsyslog
+    # - snmpd
+  sudo: yes
+
+- name: Reload monit
+  service:
+    name: monit
+    state: reloaded
+  sudo: yes

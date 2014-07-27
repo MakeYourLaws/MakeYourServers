@@ -1,23 +1,41 @@
+- name: Add run-puma
+  copy:
+    src: ../usr/local/bin/run-puma
+    dest: /usr/local/bin/run-puma
+    owner: root
+    group: root
+    mode: 0755
+  tags: puma
+  sudo: yes
 
-- name: Add puma-manager
-  template: src=puma-manager.j2 dest=/etc/init/puma-manager.conf force=yes mode=755
+- name: Add puma init.d
+  copy:
+    src: ../etc/init.d/puma
+    dest: /etc/init.d/puma
+    owner: root
+    group: root
+    mode: 0755
+  tags: puma
+  sudo: yes
+
+- name: Install puma init.d
+  shell: update-rc.d puma defaults
+  sudo: yes
   tags: puma
 
-- name: Add puma config
-  template: src=etc_puma.conf.j2 dest=/etc/puma.conf force=yes mode=755
+- name: Symlink puma monit
+  file:
+    src: /etc/monit/monitrc.d/puma
+    dest: /etc/monit/conf.d/puma
+    state: link
+    owner: root
+    group: root
+  sudo: yes
   tags: puma
 
-- name: Add puma init script
-  template: src=etc_init_puma.j2 dest=/etc/init/puma.conf force=yes mode=755
+- name: Reload monit
+  service:
+    name: monit
+    state: reloaded
+  sudo: yes
   tags: puma
-
-- name: Add puma shared/config
-  template: src=puma_production.j2 dest={{deploy_directory}}/shared/config/puma/production.rb force=yes mode=755
-  tags: puma
-
-- name: Make shared/tmp/sockets
-  file: path={{deploy_directory}}/shared/tmp/sockets group=deploy owner=deploy state=directory
-  tags: tmp
-
-- name: Restart puma-manager
-  action: service name=puma-manager state=restarted
