@@ -1,0 +1,21 @@
+---
+- local_action: "command ../linode.py --host {{ inventory_hostname }}"
+  register: linode_raw
+
+- set_fact:
+    linode: "{{ linode_raw.stdout | from_json }}"
+
+- debug: var=linode
+
+- debug: var=hostvars
+# - debug: var=group_names
+- debug: var=groups
+# - debug: var=environment
+# - debug: var=inventory_hostname
+# - debug: var=inventory_hostname_short
+# - debug: var=play_hosts
+# - debug: var=inventory_dir
+# - debug: var=inventory_file
+
+- set_fact:
+     public_gateway: "{{ public_ip | regex_replace('\\.[0-9]+$', '.1')}}"

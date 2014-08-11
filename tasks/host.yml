@@ -1,23 +1,4 @@
 ---
-# - debug:
-#     msg: "hostvars: {{hostvars}}"
-# - debug:
-#     msg: "group_names: {{group_names}}"
-# - debug:
-#     msg: "groups={{groups}}"
-# - debug:
-#     msg: "environment={{environment}}"
-- debug:
-    msg: "inventory_hostname: {{inventory_hostname}}"
-# - debug:
-#     msg: "inventory_hostname_short={{inventory_hostname_short}}"
-# - debug:
-#     msg: "play_hosts={{play_hosts}}"
-# - debug:
-#     msg: "inventory_dir={{inventory_dir}}"
-# - debug:
-#     msg: "inventory_file={{inventory_file}}"
-
 - name: Update hostname
   hostname: "name={{inventory_hostname}}"
   sudo: yes
@@ -48,3 +29,58 @@
     group: root
     mode: 0644
   sudo: yes
+
+- name: Disable IPv6
+  lineinfile:
+    state: present
+    create: yes
+    dest: /etc/sysctl.conf
+    line: "{{ item.line }}"
+    regexp: "{{ item.regexp }}"
+  sudo: yes
+  with_items:
+    - { line: "net.ipv6.conf.all.disable_ipv6 = 1", regexp: "^net.ipv6.conf.all.disable_ipv6" }
+    - { line: "net.ipv6.conf.default.disable_ipv6 = 1", regexp: "^net.ipv6.conf.default.disable_ipv6" }
+    - { line: "net.ipv6.conf.lo.disable_ipv6 = 1", regexp: "^net.ipv6.conf.lo.disable_ipv6" }
+
+- name: Reboot on out of memory
+  lineinfile:
+    state: present
+    create: yes
+    dest: /etc/sysctl.conf
+    line: "{{ item.line }}"
+    regexp: "{{ item.regexp }}"
+  sudo: yes
+  with_items:
+    - { line: "vm.panic_on_oom = 1", regexp: "^vm.panic_on_oom" }
+    - { line: "kernel.panic = 10", regexp: "^kernel.panic" }
+
+- name: Set network interfaces
+  template:
+    dest: /etc/network/interfaces
+    src: ../etc/network/interfaces.j2
+    owner: root
+    group: root
+    mode: 0644
+  sudo: yes
+
+- name: Check if both IPs are up
+  shell: "ifconfig  | grep  '{{private_ip}}' && ifconfig | grep '{{public_ip}}' && echo 'yes' || echo 'no'"
+  register: interfaces_set
+
+- name: Restart network interface
+  shell: "ifdown -a && ifup -a"
+  sudo: yes
+  when: '"no" in interfaces_set.stdout'
+
+
+- name: Remove DHCP
+  apt:
+    pkg: "{{ item }}"
+    state: absent
+  sudo: yes
+  with_items:
+    - isc-dhcp-client
+    - dhcp3-client
+    - dhcpcd
+

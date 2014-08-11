@@ -1,6 +1,4 @@
-apache2-utils
 bison
-bitcoind
 courier-base
 cron-apt
 default-jdk
@@ -9,7 +7,6 @@ deluge
 dpkg-sig
 ffmpeg
 ghc6
-handbrake-cli
 libghc6-hunit-dev
 libghc6-mtl-dev
 libghc6-network-dev
@@ -30,7 +27,5 @@ swaks
 tcl
 tclreadline
 texinfo
-transgui
-transmission
 tsung
 zlib1g-dev

@@ -1,0 +1,4 @@
+[bitcoin]
+title=Bitcoin
+description=Bitcoin
+ports=8333/tcp

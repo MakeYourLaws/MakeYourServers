@@ -5,5 +5,7 @@
     app: "makeyourlaws"
 
   tasks:
+    - include: linode_facts.yml
+    - include: myl_frontend.yml
     # - include: app_user.yml
     # - include: app.yml

@@ -1,7 +1,7 @@
 ---
-- debug:
+-
     msg: "hostvars: {{hostvars}}"
-- debug:
+-
     msg: "environment={{environment}}"
 
 - name: Install rmate

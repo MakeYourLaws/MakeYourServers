@@ -1,0 +1,4 @@
+#!/bin/sh
+
+test -x /usr/sbin/geoip-database-contrib_update || exit 0
+/usr/sbin/geoip-database-contrib_update

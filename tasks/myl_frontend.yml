@@ -1,4 +1,19 @@
 ---
+- name: "Create mylfrontend user"
+  user:
+    name: mylfrontend
+    shell: "/bin/bash"
+    groups: "makeyourlaws,users,rvm"
+    password: "{{ lookup('file', '~/myl_sensitive/server/mylfrontend_mylfrontend_password_crypted.txt') }}"
+    state: present
+  sudo: yes
+
+- name: "Add authorized_key for mylfrontend user"
+  authorized_key:
+    user: "mylfrontend"
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+  sudo: yes
+
 - name: Add MYL frontend init.d files
   copy:
     src: "{{item}}"
@@ -60,5 +75,21 @@
   sudo: yes
   tags: mylfrontend
 
-# - name: Create deploy user for mysql
-#   mysql_user: user="deploy" host="%" password={{mysql_root_password}} priv=*.*:ALL,GRANT
+- name: Add myl_production DB
+  mysql_db:
+    name: myl_production
+    state: present
+    login_user: root
+    login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
+  sudo: yes
+
+- name: Add mysql user
+  mysql_user:
+    user: myl_production
+    host: "127.0.0.1"
+    password: "{{ lookup('file', '~/myl_sensitive/keys/database.production') }}"
+    priv: "myl_production:ALL"
+    login_user: root
+    login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
+  sudo: yes
+  tags: mylfrontend

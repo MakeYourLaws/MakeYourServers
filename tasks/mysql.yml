@@ -8,6 +8,7 @@
     - mysql-client
     - python-mysqldb
     - libmysqlclient-dev
+    - automysqlbackup
   sudo: yes
 
 - name: Add my.cnf
@@ -19,6 +20,13 @@
     mode: 0600
   tags: mysql
   sudo: yes
+
+- name: Add mysql user to SSL group
+  user:
+    name: mysql
+    group: ssl
+  sudo: yes
+  tags: mysql
 
 - name: Start the MySQL service
   service:
@@ -61,6 +69,116 @@
     - localhost
   sudo: yes
 
+- name: Lock down mysql executables
+  file:
+    dest: "/usr/bin/{{ item }}"
+    owner: root
+    group: root
+    mode: 0700
+  sudo: yes
+  with_items:
+    - mysqladmin
+    - mysqlaccess
+    - mysqlbinlog
+    - mysqlbug
+    - mysqlcheck
+    - mysql_client_test
+    - mysql_config
+    - mysql_convert_table_format
+    - mysqldump
+    - mysqldumpslow
+    - mysqld_multi
+    - mysqld_safe
+    - mysql_find_rows
+    - mysql_fix_extensions
+    - mysqlhotcopy
+    - mysql_install_db
+    - mysql_plugin
+    - mysqlreport
+    - mysql_secure_installation
+    - mysql_setpermission
+    - mysqlshow
+    - mysqlslap
+    - mysqltest
+    - mysql_tzinfo_to_sql
+    - mysql_upgrade
+    - mysql_waitpid
+    - mysql_zap
+
+- name: Add optimize user
+  mysql_user:
+    user: 'optimize'
+    priv: '*.*:SELECT,INSERT'
+    host: "{{item}}"
+    password: "{{ lookup('file', '~/myl_sensitive/keys/database_optimize.production') }}"
+    state: present
+    login_user: root
+    login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
+  with_items:
+    - 127.0.0.1
+    - localhost
+  sudo: yes
+
+- name: Add backup user
+  mysql_user:
+    user: 'backup'
+    priv: "*.*:SELECT,RELOAD,LOCK TABLES"
+    host: "{{item}}"
+    password: "{{ lookup('file', '~/myl_sensitive/keys/database_backup.production') }}"
+    state: present
+    login_user: root
+    login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
+  with_items:
+    - 127.0.0.1
+    - localhost
+  sudo: yes
+
+- name: Add my.cnf for automatic passwords
+  template:
+    dest: /etc/my.cnf
+    src: ../etc/my.cnf.j2
+    owner: root
+    group: root
+    mode: 0600
+  sudo: yes
+
+- name: Add automysqlbackup folder
+  file:
+    path: /root/automysqlbackup
+    owner: root
+    group: root
+    mode: 0600
+    state: directory
+  sudo: yes
+
+- name: Add automysqlbackup conf
+  copy:
+    src: ../etc/default/automysqlbackup
+    dest: /etc/default/automysqlbackup
+    owner: root
+    group: root
+    mode: 0644
+  sudo: yes
+
+# - name: Add mysql daily backup
+#   copy:
+#     src: ../etc/cron.daily/automysqlbackup
+#     dest: /etc/cron.daily/automysqlbackup
+#     owner: root
+#     group: root
+#     mode: 0755
+#   sudo: yes
+
+# - name: Add mysql weekly optimize
+#   copy:
+#     src: ../etc/cron.weekly/mysqloptimize
+#     dest: /etc/cron.weekly/mysqloptimize
+#     owner: root
+#     group: root
+#     mode: 0755
+#   sudo: yes
+
+# TODO: Only if my.cnf, root p/w, test db, or anon users have changed
 - name: Restart the MySQL service
   service:
     name: mysql

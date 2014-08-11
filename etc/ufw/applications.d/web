@@ -1,0 +1,4 @@
+[web]
+title=Web
+description=Web server
+ports=80,443/tcp

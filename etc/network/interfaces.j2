@@ -1,0 +1,23 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto eth0 eth0:0
+# iface eth0 inet dhcp
+
+# eth0 - This is the main IP address that will be used for most outbound connections.
+# The address, netmask and gateway are all necessary.
+iface eth0 inet static
+ address {{ linode.public_ip }}
+ netmask 255.255.255.0
+ gateway {{ public_gateway }}
+
+# eth0:0 - Private IPs have no gateway (they are not publicly routable) so all you need to
+# specify is the address and netmask.
+iface eth0:0 inet static
+ address {{ linode.private_ip }}
+ netmask 255.255.128.0

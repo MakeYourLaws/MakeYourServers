@@ -1,0 +1,24 @@
+---
+- name: Install geoip
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+  sudo: True
+  with_items:
+    - geoip-bin
+    - libgeoip1
+    - geoip-database
+    - geoip-database-contrib
+
+- name: Update GeoIP DB
+  shell: "/usr/sbin/geoip-database-contrib_update"
+  sudo: yes
+
+- name: Add GeoIP weekly updater
+  copy:
+    src: ../etc/cron.weekly/geoip
+    dest: /etc/cron.weekly/geoip
+    owner: root
+    group: root
+    mode: 0755
+  sudo: yes

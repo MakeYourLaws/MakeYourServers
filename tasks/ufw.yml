@@ -1,0 +1,69 @@
+---
+- name: Add UFW conf
+  copy:
+    src: "{{item}}"
+    dest: /etc/ufw/
+    owner: root
+    group: root
+    mode: 0644
+  tags: ufw
+  sudo: yes
+  with_fileglob:
+    - ../etc/ufw/*.conf
+
+- name: Add UFW applications
+  copy:
+    src: "{{item}}"
+    dest: /etc/ufw/applications.d/
+    owner: root
+    group: root
+    mode: 0644
+  tags: ufw
+  sudo: yes
+  with_fileglob:
+    - ../etc/ufw/applications.d/*
+
+- name: Reset UFW
+  ufw:
+    state: reset
+  sudo: yes
+
+- name: Block IPv6
+  ufw:
+    proto: ipv6
+    rule: deny
+  sudo: yes
+
+- name: Allow UFW applications
+  ufw:
+    rule: allow
+    name: "{{ item }}"
+  sudo: yes
+  with_items:
+    - web
+    - tor
+    - openfire
+
+- name: Log and limit UFW applications
+  ufw:
+    rule: limit
+    name: "{{ item }}"
+    log: yes
+  sudo: yes
+  with_items:
+    - exim4
+    - monit
+    - mosh
+
+- name: Log and limit UFW applications
+  ufw:
+    rule: limit
+    port: ssh  # not the applications.d openssh
+    log: yes
+  sudo: yes
+
+- ufw:
+    state: enabled
+    direction: incoming
+    policy: deny
+  sudo: yes

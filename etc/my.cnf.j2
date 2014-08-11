@@ -1,0 +1,10 @@
+[mysqlcheck]
+
+auto-repair
+password = {{ lookup('file', '~/myl_sensitive/keys/database_optimize.production') }}
+user = optimize
+
+[mysqldump]
+
+password = {{ lookup('file', '~/myl_sensitive/keys/database_backup.production') }}
+user = backup

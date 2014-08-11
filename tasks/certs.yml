@@ -48,3 +48,19 @@
     mode: 0400
   tags: ssl
   sudo: yes
+
+- name: Symlink current certs
+  file:
+    dest: "/etc/ssl/localcerts/{{ item.dest }}"
+    src: "/etc/ssl/localcerts/{{ item.src }}"
+    state: link
+    owner: root
+    group: ssl
+  sudo: yes
+  with_items:
+    - { dest: "makeyourlaws.org.combined.crt", src: "makeyourlaws.org.ev.combined.2014.crt" }
+    - { dest: "makeyourlaws.org.combined.pem", src: "makeyourlaws.org.ev.combined.2014.crt" }
+    - { dest: "makeyourlaws.org.crt", src: "makeyourlaws.org.ev.2014.crt" }
+    - { dest: "makeyourlaws.org.csr", src: "makeyourlaws.org.ev.2014.csr" }
+    - { dest: "makeyourlaws.org.key", src: "makeyourlaws.org.ev.2014.key_with_rsa" }
+    - { dest: "makeyourlaws.org.key_with_rsa", src: "makeyourlaws.org.ev.2014.key_with_rsa" }

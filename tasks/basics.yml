@@ -8,11 +8,84 @@
     - build-essential
     - gzip
     - fail2ban
+    - ipset
     - clamav
     - iftop
     - ntp
     - git
     - acpid
+    - apt-file
+    - update-notifier-common
+    - unattended-upgrades
+    - mosh
+    #
+    # - autoconf
+    # - automake
+    # - bison
+    # - build-essential
+    # - curl
+    # - gawk
+    # - git-core
+    # - git
+    # - libxml2-dev
+    # - libffi-dev
+    # - libyaml-dev
+    # - libssl-dev
+    # - libsqlite3-dev
+    # - libgdbm-dev
+    # - libncurses5-dev
+    # - libreadline6-dev
+    # - libtool
+    # - libyaml-dev
+    # - nfs-common # make virtualbox faster
+    # - pkg-config
+    # - sqlite3
+    # - vim
+    # - zlib1g-dev
+
+- name: Copy unattended-upgrades config
+  copy:
+    src: ../etc/apt/apt.conf.d/50unattended-upgrades
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+    owner: root
+    group: root
+    mode: 0644
+  sudo: yes
+
+- name: Enable unattended-upgrades
+  lineinfile:
+    state: present
+    create: yes
+    dest: /etc/apt/apt.conf.d/10periodic
+    line: "{{ item.line }}"
+    regexp: "{{ item.regexp }}"
+  sudo: yes
+  with_items:
+    - { line: 'APT::Periodic::Update-Package-Lists "1";', regexp: "^APT::Periodic::Update-Package-Lists" }
+    - { line: 'APT::Periodic::Unattended-Upgrade "1";', regexp: "^APT::Periodic::Unattended-Upgrade" }
+    - { line: 'APT::Periodic::Enable "1";', regexp: "^APT::Periodic::Enable"}
+    - { line: 'APT::Periodic::Download-Upgradeable-Packages "1";', regexp: "^APT::Periodic::Download-Upgradeable-Packages"}
+    - { line: 'APT::Periodic::Verbose "2";', regexp: "^APT::Periodic::Verbose" }
+    - { line: 'APT::Periodic::AutocleanInterval "28";', regexp: "^APT::Periodic::AutocleanInterval"}
+
+# - name: Install logwatch
+#   action: apt pkg=logwatch state=installed
+#
+# - name: Make logwatch mail $logwatch_email daily
+#   action: lineinfile dest=/etc/cron.daily/00logwatch regexp="^/usr/sbin/logwatch" line="/usr/sbin/logwatch --output mail --mailto $logwatch_email --detail high" state=present create=yes
+
+- name: Update apt-file
+  shell: "apt-file update"
+  sudo: yes
+
+- name: Copy fail2ban conf
+  copy:
+    src: ../etc/fail2ban/jail.conf
+    dest: /etc/fail2ban/jail.conf
+    owner: root
+    group: root
+    mode: 0644
+  sudo: yes
 
 - name: Ensure permissions on system init.d files
   file:
