@@ -1,0 +1,4 @@
+check program ufw with path "/etc/monit/ufw_check.sh"
+	if status != 0 then alert
+    start program = "/usr/sbin/service ufw start"
+    stop program = "/usr/sbin/service ufw stop"

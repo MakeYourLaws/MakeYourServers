@@ -34,15 +34,11 @@
     rule: deny
   sudo: yes
 
-- name: Allow UFW applications
+- name: Allow UFW web
   ufw:
     rule: allow
-    name: "{{ item }}"
+    name: web
   sudo: yes
-  with_items:
-    - web
-    - tor
-    - openfire
 
 - name: Log and limit UFW applications
   ufw:
@@ -62,8 +58,26 @@
     log: yes
   sudo: yes
 
-- ufw:
+- name: Enable UFW with default deny incoming
+  ufw:
     state: enabled
     direction: incoming
     policy: deny
   sudo: yes
+
+- name: Symlink ufw monit
+  file:
+    src: /etc/monit/monitrc.d/ufw
+    dest: /etc/monit/conf.d/ufw
+    state: link
+    owner: root
+    group: root
+  sudo: yes
+  tags: ufw
+
+- name: Reload monit
+  service:
+    name: monit
+    state: reloaded
+  sudo: yes
+  tags: ufw

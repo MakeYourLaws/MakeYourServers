@@ -1,8 +1,8 @@
- check process puma with pidfile /home/makeyourlaws/makeyourlaws.org/shared/tmp/pids/puma.pid
+ check process puma with pidfile /home/mylfrontend/makeyourlaws.org/shared/tmp/pids/puma.pid
    group puma
    group mylfrontend
-   start program = "/usr/sbin/service puma start /home/makeyourlaws/makeyourlaws.org"
-   stop  program = "/usr/sbin/service puma stop /home/makeyourlaws/makeyourlaws.org"
+   start program = "/usr/sbin/service puma start /home/mylfrontend/makeyourlaws.org"
+   stop  program = "/usr/sbin/service puma stop /home/mylfrontend/makeyourlaws.org"
    if 5 restarts within 5 cycles then timeout
    depends on puma_rc
 

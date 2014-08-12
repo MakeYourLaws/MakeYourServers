@@ -1,0 +1,75 @@
+---
+- name: Add MYL frontend init.d files
+  copy:
+    src: "{{item}}"
+    dest: /etc/init.d/
+    owner: root
+    group: root
+    mode: 0755
+  tags: mylfrontend
+  sudo: yes
+  with_fileglob:
+    - ../etc/init.d/mylfrontend_*
+
+- name: Add MYL frontend puma conf
+  lineinfile:
+    state: present
+    create: yes
+    dest: /etc/puma.conf
+    line: "/home/mylfrontend/makeyourlaws.org/current,mylfrontend,/home/mylfrontend/makeyourlaws.org/current/config/puma/production.rb"
+    regexp: "^/home/mylfrontend/makeyourlaws.org"
+    owner: root
+    group: root
+    mode: 0644
+  sudo: yes
+  tags: mylfrontend
+
+- name: Add site configs
+  copy:
+    src: "../etc/nginx/sites-available/{{item}}.conf"
+    dest: "/etc/nginx/sites-available/{{item}}.conf"
+    owner: root
+    group: root
+    mode: 0644
+  tags: nginx
+  sudo: yes
+  with_items:
+    # - mylfrontend_tor
+    - mylfrontend
+    # - mylwiki
+
+- name: Enable MYL frontend
+  file:
+    src: "/etc/nginx/sites-available/{{item}}.conf"
+    dest: "/etc/nginx/sites-enabled/{{item}}.conf"
+    state: link
+    owner: root
+    group: root
+    mode: 0644
+  tags: mylfrontend
+  sudo: yes
+  with_items:
+    # - mylfrontend_tor
+    - mylfrontend
+    # - mylwiki
+
+- name: Symlink mylfrontend_puma monit files
+  file:
+    src: "/etc/monit/monitrc.d/{{item}}"
+    dest: "/etc/monit/conf.d/{{item}}"
+    state: link
+    owner: root
+    group: root
+  sudo: yes
+  tags: mylfrontend
+  with_items:
+    - mylfrontend_resque
+    - mylfrontend_resque_scheduler
+    - mylfrontend_puma
+
+- name: Reload monit
+  service:
+    name: monit
+    state: reloaded
+  sudo: yes
+  tags: mylfrontend

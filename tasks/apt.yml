@@ -1,11 +1,36 @@
 ---
+- name: Enable partner and extras
+  lineinfile:
+    state: present
+    create: yes
+    dest: /etc/apt/sources.list
+    line: "{{ item.line }}"
+    regexp: "{{ item.regexp }}"
+    backrefs: yes
+  sudo: yes
+  with_items:
+    - { line: 'deb \1 partner', regexp: '^[ #]*deb (.*) partner$' }
+    - { line: 'deb-src \1 partner', regexp: '^[ #]*deb-src (.*) partner$' }
+    - { line: 'deb \1extras\2', regexp: '^[ #]*deb (.*)extras(.*)$' }
+    - { line: 'deb-src \1extras\2', regexp: '^[ #]*deb-src (.*)extras(.*)$' }
+
+- name: Check if extras signing key exists
+  shell: "apt-key list | grep 3E5C1192 && echo 'yes' || echo 'no'"
+  register: extras_signing_key
+  sudo: yes
+
+- name: Add nginx signing key
+  shell: "apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 16126D3A3E5C1192"
+  when: '"no" in extras_signing_key.stdout'
+  sudo: yes
+
 - name: Update APT package cache
   action: apt update_cache=yes
-  sudo: True
+  sudo: yes
 
 - name: Upgrade APT to the lastest packages
   action: apt upgrade=safe
-  sudo: True
+  sudo: yes
   register: upgraded_packages
 
 - debug: var=upgraded_packages.stdout_lines

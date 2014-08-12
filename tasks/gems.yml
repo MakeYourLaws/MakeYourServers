@@ -1,9 +1,4 @@
 ---
--
-    msg: "hostvars: {{hostvars}}"
--
-    msg: "environment={{environment}}"
-
 - name: Install rmate
   gem:
     name: rmate

@@ -5,7 +5,7 @@
   apt:
     pkg: smartmontools
     state: latest
-  sudo: True
+  sudo: yes
 
 - name: Ensure permissions on smartmontools init.d file
   file:

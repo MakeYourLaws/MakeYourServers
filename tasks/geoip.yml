@@ -3,11 +3,11 @@
   apt:
     pkg: "{{ item }}"
     state: latest
-  sudo: True
+  sudo: yes
   with_items:
     - geoip-bin
     - libgeoip1
-    - geoip-database
+    # - geoip-database
     - geoip-database-contrib
 
 - name: Update GeoIP DB

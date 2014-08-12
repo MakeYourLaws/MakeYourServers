@@ -3,7 +3,7 @@
   apt:
     pkg: "{{ item }}"
     state: latest
-  sudo: True
+  sudo: yes
   with_items:
     - build-essential
     - gzip
@@ -13,20 +13,23 @@
     - iftop
     - ntp
     - git
+    - subversion
     - acpid
+    - libnotify-bin
     - apt-file
     - update-notifier-common
     - unattended-upgrades
     - mosh
-    #
+    - apt-listchanges
+    - zip
+    - htop
+    - imagemagick
+    - apticron
+    - curl
+    - gawk
     # - autoconf
     # - automake
     # - bison
-    # - build-essential
-    # - curl
-    # - gawk
-    # - git-core
-    # - git
     # - libxml2-dev
     # - libffi-dev
     # - libyaml-dev
@@ -42,6 +45,15 @@
     # - sqlite3
     # - vim
     # - zlib1g-dev
+
+- name: Copy apticron config
+  copy:
+    src: ../etc/apticron/apticron.conf
+    dest: /etc/apticron/apticron.conf
+    owner: root
+    group: root
+    mode: 0644
+  sudo: yes
 
 - name: Copy unattended-upgrades config
   copy:
@@ -99,3 +111,4 @@
     - ntp
     - ssh
     - rsyslog
+

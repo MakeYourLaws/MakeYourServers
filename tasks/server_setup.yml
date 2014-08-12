@@ -9,21 +9,22 @@
   tasks:
   - include: linode_facts.yml
   # - include: host.yml
-  # - include: apt.yml
-  - include: basics.yml
-  # - include: ufw.yml # TODO: get rid of ipv6 in application rules
-  # - include: rvm.yml
-  # - include: ruby.yml
-  # - include: gems.yml
   # - include: certs.yml
+  # - include: apt.yml
+  # - include: basics.yml
   # - include: exim4.yml
   # - include: monit.yml
   # - include: exim4_monit.yml
-  # - include: smartmontools.yml # only on non-virtual server
+  # - include: ufw.yml # TODO: get rid of ipv6 in application rules
+  # - include: newrelic.yml
+  # - include: rvm.yml
+  # - include: ruby.yml
+  # - include: gems.yml
+  # # - include: smartmontools.yml # only on non-virtual server
   # - include: mysql.yml # TODO: fix automysqlbackup & mysqloptimize
   # - include: redis.yml
   # - include: geoip.yml
-  # - include: nginx.yml
+  - include: nginx.yml
   # - include: puma.yml
 
   # handlers:

@@ -1,0 +1,84 @@
+---
+- name: Make newrelic group
+  group:
+    name: newrelic
+    system: yes
+    state: present
+  sudo: yes
+  tags: newrelic
+
+- name: Make newrelic user
+  user:
+    name: newrelic
+    createhome: no
+    group: newrelic
+    shell: /bin/false
+    system: yes
+    state: present
+  sudo: yes
+
+- name: Copy newrelic source
+  copy:
+    src: ../etc/apt/sources.list.d/newrelic.list
+    dest: /etc/apt/sources.list.d/newrelic.list
+    owner: root
+    group: root
+    mode: 0644
+  sudo: yes
+  tags: newrelic
+
+- name: Install newrelic apt_key
+  apt_key:
+    url: https://download.newrelic.com/548C16BF.gpg
+    state: present
+  sudo: yes
+  tags: newrelic
+
+- name: Add newrelic dirs
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: newrelic
+    mode: 0770
+  sudo: yes
+  with_items:
+    - /var/run/newrelic
+    - /var/log/newrelic
+    - /etc/newrelic
+  tags: newrelic
+
+- name: Install newrelic conf file
+  template:
+    src: ../etc/newrelic/nrsysmond.cfg.j2
+    dest: /etc/newrelic/nrsysmond.cfg
+    owner: root
+    group: newrelic
+    mode: 0640
+  sudo: yes
+  tags: newrelic
+
+- name: Install newrelic
+  apt:
+    pkg: newrelic-sysmond
+    update_cache: yes
+    state: latest
+  sudo: yes
+  tags: newrelic
+
+- name: Symlink newrelic monit
+  file:
+    src: /etc/monit/monitrc.d/newrelic_sysmond
+    dest: /etc/monit/conf.d/newrelic_sysmond
+    state: link
+    owner: root
+    group: root
+  sudo: yes
+  tags: newrelic
+
+- name: Reload monit
+  service:
+    name: monit
+    state: reloaded
+  sudo: yes
+  tags: mysql

@@ -1,0 +1,4 @@
+check process tor with pidfile /var/run/tor/tor.pid
+  start program = "/usr/sbin/service tor start"
+  stop program = "/usr/sbin/service tor stop"
+  if mem > 70 MB for 3 cycles then restart

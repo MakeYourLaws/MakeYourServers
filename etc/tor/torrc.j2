@@ -68,7 +68,7 @@ Log notice file /var/log/tor/notices.log
 ## HiddenServicePort x y:z says to redirect requests on port x to the
 ## address y:z.
 
-HiddenServiceDir /home/makeyourlaws/makeyourlaws.org/shared/tor/
+HiddenServiceDir /home/mylfrontend/makeyourlaws.org/shared/tor/
 HiddenServicePort 80 127.0.0.1:81
 HiddenServicePort 443 127.0.0.1:81 # onion should be non-SSL only.
 					# SSL leaks info and we're already encrypted.
@@ -128,7 +128,7 @@ AccountingStart day 00:00
 ## Contact info to be published in the directory, so we can contact you
 ## if your relay is misconfigured or something else goes wrong. Google
 ## indexes this, so spammers might also collect it.
-ContactInfo Sai <core AT makeyourlaws DOT org>  # Random Person <nobody AT example dot com>
+ContactInfo Sai <tor AT makeyourlaws DOT org>  # Random Person <nobody AT example dot com>
 ## You might also include your PGP or GPG fingerprint if you have one:
 #ContactInfo 0xFFFFFFFF Random Person <nobody AT example dot com>
 
@@ -176,7 +176,7 @@ ContactInfo Sai <core AT makeyourlaws DOT org>  # Random Person <nobody AT examp
 ## for ExitPolicyRejectPrivate if you want to allow "exit enclaving".
 ##
 ExitPolicyRejectPrivate 0
-ExitPolicy accept 173.255.252.140:443,accept 173.255.252.140:80
+ExitPolicy accept {{ linode.public_ip }}:443,accept {{ linode.public_ip }}:80
 #ExitPolicy accept *:6660-6667,reject *:* # allow irc ports but no more
 #ExitPolicy accept *:119 # accept nntp as well as default exit policy
 ExitPolicy reject *:* # no exits allowed

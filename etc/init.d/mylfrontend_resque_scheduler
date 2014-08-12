@@ -1,20 +1,20 @@
 #!/bin/sh -e
 
 ### BEGIN INIT INFO
-# Provides:          resque-scheduler-makeyourlaws
+# Provides:          mylfrontend_resque_scheduler
 # Required-Start:    $local_fs $remote_fs $network $syslog
 # Required-Stop:     $local_fs $remote_fs $network $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: resque-scheduler init script for makeyourlaws
+# Short-Description: resque-scheduler init script for mylfrontend
 # Description:       resque-scheduler schedules resque tasks
 ### END INIT INFO
 
 # make sure your pidfile here matches your monitrc
-app_name="makeyourlaws"
-pidfile="/home/makeyourlaws/makeyourlaws.org/shared/tmp/pids/scheduler.pid"
-app_dir="/home/makeyourlaws/makeyourlaws.org/current"
-run_as_user="makeyourlaws"
+app_name="mylfrontend"
+pidfile="/home/mylfrontend/makeyourlaws.org/shared/tmp/pids/scheduler.pid"
+app_dir="/home/mylfrontend/makeyourlaws.org/current"
+run_as_user="mylfrontend"
 sleep_time_during_restart=5
 stop_schedule="QUIT/30/INT/10/KILL/5"
 ruby="/usr/local/rvm/bin/rvm"

@@ -6,24 +6,25 @@
     local_user: "{{ lookup('env', 'USER') }}"
 
   vars_prompt:
-  - name: "user_password"
-    prompt: "Enter password for your user"
+  - name: user_password
+    prompt: Enter password for your user
     private: yes
-    encrypt: "sha512_crypt"
+    encrypt: sha512_crypt
     confirm: yes
     salt_size: 7
 
   tasks:
-    - name: "Create local user"
+    - name: Create local user
       user:
         name: "{{ local_user }}"
-        shell: "/bin/bash"
-        append: "yes"
-        groups: "sudo"
+        shell: /bin/bash
+        append: yes
+        groups: sudo
+        group: "{{ local_user }}"
         password: "{{ user_password }}"
-        state: "present"
+        state: present
 
-    - name: "Add authorized_key for local user"
+    - name: Add authorized_key for local user
       authorized_key:
         user: "{{ local_user }}"
         key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
@@ -35,6 +36,24 @@
     - name: Disallow password authentication
       action: lineinfile dest=/etc/ssh/sshd_config regexp="^PasswordAuthentication" line="PasswordAuthentication no" state=present
       notify: Restart ssh
+
+    - name: Secure home directory
+      file:
+        path: "/home/{{ local_user }}/"
+        state: directory
+        owner: "{{local_user}}"
+        group: "{{local_user}}"
+        mode: 0750
+
+    - name: Copy dotfiles
+      copy:
+        src: "{{item}}"
+        dest: "/home/{{ local_user }}/"
+        owner: "{{local_user}}"
+        group: "{{local_user}}"
+        mode: 0640
+      with_fileglob:
+        - ../dotfiles/.*
 
   handlers:
   - name: Restart ssh

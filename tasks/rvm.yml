@@ -9,14 +9,17 @@
   apt: pkg=git state=latest update_cache=yes
   sudo: yes
 
-- name: Install rvmrc
+- name: Install gemrc and rvmrc
   copy:
-    src: ../etc/rvmrc
-    dest: /etc/rvmrc
+    src: "../etc/{{item}}"
+    dest: "../etc/{{item}}"
     owner: root
     group: rvm
     mode: 0644
   sudo: yes
+  with_items:
+    - rvmrc
+    - gemrc
 
 - name: Install rvm
   shell: '\curl -sSL https://get.rvm.io | bash -s stable'
@@ -30,7 +33,7 @@
     line: 'type rvm >/dev/null 2>/dev/null || echo ${PATH} | GREP_OPTIONS="" \grep "/usr/local/rvm/bin" > /dev/null || export PATH="${PATH}:/usr/local/rvm/bin"'
     insertbefore: BOF
     regexp: "^type rvm"
-  sudo: True
+  sudo: yes
 
 - name: Install rvm requirements
   shell: rvm requirements

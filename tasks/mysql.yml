@@ -24,7 +24,8 @@
 - name: Add mysql user to SSL group
   user:
     name: mysql
-    group: ssl
+    groups: ssl
+    append: yes
   sudo: yes
   tags: mysql
 
@@ -83,7 +84,7 @@
     - mysqlbug
     - mysqlcheck
     - mysql_client_test
-    - mysql_config
+    # - mysql_config
     - mysql_convert_table_format
     - mysqldump
     - mysqldumpslow
@@ -105,33 +106,33 @@
     - mysql_waitpid
     - mysql_zap
 
-- name: Add optimize user
-  mysql_user:
-    user: 'optimize'
-    priv: '*.*:SELECT,INSERT'
-    host: "{{item}}"
-    password: "{{ lookup('file', '~/myl_sensitive/keys/database_optimize.production') }}"
-    state: present
-    login_user: root
-    login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
-  with_items:
-    - 127.0.0.1
-    - localhost
-  sudo: yes
-
-- name: Add backup user
-  mysql_user:
-    user: 'backup'
-    priv: "*.*:SELECT,RELOAD,LOCK TABLES"
-    host: "{{item}}"
-    password: "{{ lookup('file', '~/myl_sensitive/keys/database_backup.production') }}"
-    state: present
-    login_user: root
-    login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
-  with_items:
-    - 127.0.0.1
-    - localhost
-  sudo: yes
+# - name: Add optimize user
+#   mysql_user:
+#     user: 'optimize'
+#     priv: '*.*:SELECT,INSERT'
+#     host: "{{item}}"
+#     password: "{{ lookup('file', '~/myl_sensitive/keys/database_optimize.production') }}"
+#     state: present
+#     login_user: root
+#     login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
+#   with_items:
+#     - 127.0.0.1
+#     - localhost
+#   sudo: yes
+#
+# - name: Add backup user
+#   mysql_user:
+#     user: 'backup'
+#     priv: "*.*:SELECT,RELOAD,LOCK TABLES"
+#     host: "{{item}}"
+#     password: "{{ lookup('file', '~/myl_sensitive/keys/database_backup.production') }}"
+#     state: present
+#     login_user: root
+#     login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
+#   with_items:
+#     - 127.0.0.1
+#     - localhost
+#   sudo: yes
 
 - name: Add my.cnf for automatic passwords
   template:

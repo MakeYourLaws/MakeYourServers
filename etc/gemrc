@@ -1,0 +1,8 @@
+verbose: true
+bulk_treshold: 1000
+install: --no-ri --no-rdoc --env-shebang
+benchmark: false
+backtrace: false
+update: --no-ri --no-rdoc --env-shebang
+update_sources: true
+gem: --no-rdoc --no-ri

@@ -21,6 +21,7 @@
   user:
     name: nginx
     createhome: no
+    groups: "nginx,ssl"
     group: nginx
     shell: /bin/false
     system: yes
@@ -28,14 +29,27 @@
   sudo: yes
 
 - name: Add nginx.list
-  copy:
-    src: ../etc/apt/sources.list.d/nginx.list
+  template:
+    src: ../etc/apt/sources.list.d/nginx.list.j2
     dest: /etc/apt/sources.list.d/nginx.list
     owner: root
     group: root
     mode: 0644
   tags: nginx
   sudo: yes
+
+- name: Add nginx directories
+  file:
+    path: "{{ item }}"
+    owner: nginx
+    group: nginx
+    state: directory
+    mode: 0750
+  tags: nginx
+  sudo: yes
+  with_items:
+    - /etc/nginx/
+    - /etc/nginx/logs/
 
 - name: Install nginx
   apt:
@@ -54,32 +68,18 @@
   sudo: yes
 
 - name: Remove the default app
-  shell: "[[ -f /etc/nginx/conf.d/default.conf ]] && rm /etc/nginx/conf.d/default.conf"
+  shell: "rm /etc/nginx/conf.d/default.conf 2> /dev/null || echo 1" # ignore if not there
   sudo: yes
 
 - name: Add site directories
   file:
-    path: /etc/nginx/{{item}}
+    path: "/etc/nginx/{{item}}"
     state: directory
   with_items:
     - sites-available
     - sites-enabled
   tags: nginx
   sudo: yes
-
-- name: Add site configs
-  copy:
-    src: "../etc/nginx/sites-available/{{item}}.conf"
-    dest: "/etc/nginx/sites-available/{{item}}.conf"
-    owner: root
-    group: root
-    mode: 0644
-  tags: nginx
-  sudo: yes
-  with_items:
-    - mylfrontend_tor
-    - mylfrontend
-    - mylwiki
 
 - name: Symlink nginx monit
   file:

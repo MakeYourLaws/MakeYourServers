@@ -1,0 +1,81 @@
+---
+- name: Make tor group
+  group:
+    name: tor
+    system: yes
+    state: present
+  sudo: yes
+
+- name: Add tor.list
+  template:
+    src: ../etc/apt/sources.list.d/tor.list.j2
+    dest: /etc/apt/sources.list.d/tor.list
+    owner: root
+    group: root
+    mode: 0644
+  tags: tor
+  sudo: yes
+
+- name: Install tor
+  apt:
+    pkg: "{{item}}"
+    state: latest
+    update_cache: true
+  tags: tor
+  sudo: yes
+  with_items:
+    - deb.torproject.org-keyring
+    - tor
+
+- name: Add torrc
+  template:
+    src: ../etc/tor/torrc.j2
+    dest: /etc/tor/torrc
+    owner: root
+    group: tor
+    mode: 0640
+  tags: tor
+  sudo: yes
+
+- name: Add tor-tsocks.conf
+  copy:
+    src: ../etc/tor/tor-tsocks.conf
+    dest: /etc/tor/tor-tsocks.conf
+    owner: root
+    group: tor
+    mode: 0640
+  tags: tor
+  sudo: yes
+
+- name: Add torsocks.conf
+  copy:
+    src: ../etc/torsocks.conf
+    dest: /etc/torsocks.conf
+    owner: root
+    group: tor
+    mode: 0640
+  tags: tor
+  sudo: yes
+
+- name: Allow tor on UFW
+  ufw:
+    rule: allow
+    name: tor
+  sudo: yes
+
+- name: Symlink tor monit
+  file:
+    src: /etc/monit/monitrc.d/tor
+    dest: /etc/monit/conf.d/tor
+    state: link
+    owner: root
+    group: root
+  sudo: yes
+  tags: tor
+
+- name: Reload monit
+  service:
+    name: monit
+    state: reloaded
+  sudo: yes
+  tags: tor

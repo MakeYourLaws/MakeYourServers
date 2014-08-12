@@ -28,6 +28,16 @@
   with_fileglob:
     - ../etc/monit/monitrc.d/*
 
+- name: Add ufw check file
+  copy:
+    src: ../etc/monit/ufw_check.sh
+    dest: /etc/monit/ufw_check.sh
+    owner: root
+    group: root
+    mode: 0754
+  tags: monit
+  sudo: yes
+
 - name: Symlink system monits
   file:
     src: /etc/monit/monitrc.d/{{item}}
@@ -39,6 +49,8 @@
     - acpid
     - at
     - cron
+    - system
+    - fs
     # - mdadm
     - ntp
     - openssh-server

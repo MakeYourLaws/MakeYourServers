@@ -1,7 +1,7 @@
-check process makeyourlaws_resque_scheduler
-  with pidfile /home/makeyourlaws/makeyourlaws.org/shared/tmp/pids/scheduler.pid
-  start program = "/usr/sbin/service makeyourlaws_resque_scheduler start" with timeout 90 seconds
-  stop program  = "/etc/init.d/makeyourlaws_resque_scheduler stop"  with timeout 90 seconds
+check process mylfrontend_resque_scheduler
+  with pidfile /home/mylfrontend/makeyourlaws.org/shared/tmp/pids/scheduler.pid
+  start program = "/usr/sbin/service mylfrontend_resque_scheduler start" with timeout 90 seconds
+  stop program  = "/etc/init.d/mylfrontend_resque_scheduler stop"  with timeout 90 seconds
   #if totalmem is greater than 300 MB for 10 cycles then restart # eating up memory?
   group resque
   group mylfrontend
