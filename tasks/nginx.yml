@@ -21,7 +21,7 @@
   user:
     name: nginx
     createhome: no
-    groups: "nginx,ssl"
+    groups: ssl
     group: nginx
     shell: /bin/false
     system: yes
@@ -49,7 +49,7 @@
   sudo: yes
   with_items:
     - /etc/nginx/
-    - /etc/nginx/logs/
+    - /var/log/nginx/
 
 - name: Install nginx
   apt:

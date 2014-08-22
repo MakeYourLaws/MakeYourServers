@@ -1,0 +1,11 @@
+---
+- name: Install apparmor
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+  sudo: yes
+  with_items:
+    - apparmor
+    - apparmor-docs
+    - apparmor-profiles
+    - apparmor-utils

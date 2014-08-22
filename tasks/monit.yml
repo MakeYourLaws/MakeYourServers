@@ -40,14 +40,12 @@
 
 - name: Symlink system monits
   file:
-    src: /etc/monit/monitrc.d/{{item}}
-    dest: /etc/monit/conf.d/{{item}}
+    src: "/etc/monit/monitrc.d/{{item}}"
+    dest: "/etc/monit/conf.d/{{item}}"
     state: link
     owner: root
     group: root
   with_items:
-    - acpid
-    - at
     - cron
     - system
     - fs
@@ -56,9 +54,22 @@
     - openssh-server
     # - pdns-recursor
     # - postfix
-    - rsyslog
     # - snmpd
   sudo: yes
+
+- name: Symlink post-Precise system monits
+  file:
+    src: "/etc/monit/monitrc.d/{{item}}"
+    dest: "/etc/monit/conf.d/{{item}}"
+    state: link
+    owner: root
+    group: root
+  sudo: yes
+  with_items:
+    - atd
+    - acpid
+    - rsyslog
+  when: ansible_distribution_release != 'precise'
 
 - name: Reload monit
   service:

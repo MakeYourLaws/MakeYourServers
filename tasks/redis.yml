@@ -50,6 +50,8 @@
   sysctl:
     name: vm.overcommit_memory
     value: "1"
+    reload: yes
+    sysctl_set: yes
     state: present
   sudo: yes
 

@@ -68,7 +68,7 @@ Log notice file /var/log/tor/notices.log
 ## HiddenServicePort x y:z says to redirect requests on port x to the
 ## address y:z.
 
-HiddenServiceDir /home/mylfrontend/makeyourlaws.org/shared/tor/
+HiddenServiceDir /var/lib/tor/mylfrontend/
 HiddenServicePort 80 127.0.0.1:81
 HiddenServicePort 443 127.0.0.1:81 # onion should be non-SSL only.
 					# SSL leaks info and we're already encrypted.

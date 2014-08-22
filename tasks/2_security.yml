@@ -1,0 +1,24 @@
+---
+- hosts: all
+
+  handlers:
+  - name: Restart ssh
+    service:
+      name: ssh
+      state: restarted
+    sudo: yes
+
+  tasks:
+  - include: linode_facts.yml
+  - include: host.yml
+  - include: apt.yml
+  - include: miscellaneous_security.yml
+  - include: ssh_security.yml
+  - include: network_security.yml
+  - include: certs.yml # Required for exim to have DKIM & SASL
+  - include: exim4.yml # Required for monit to send notifications
+  - include: monit.yml  # Required to keep things up
+  - include: exim4_monit.yml # Special case to make exim4 covered by monit too
+  - include: fail2ban.yml
+  - include: logwatch.yml
+  - include: ufw.yml # TODO: get rid of ipv6 in application rules

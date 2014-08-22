@@ -32,7 +32,7 @@
     src: ../etc/tor/torrc.j2
     dest: /etc/tor/torrc
     owner: root
-    group: tor
+    group: debian-tor
     mode: 0640
   tags: tor
   sudo: yes
@@ -42,7 +42,7 @@
     src: ../etc/tor/tor-tsocks.conf
     dest: /etc/tor/tor-tsocks.conf
     owner: root
-    group: tor
+    group: debian-tor
     mode: 0640
   tags: tor
   sudo: yes
@@ -52,10 +52,17 @@
     src: ../etc/torsocks.conf
     dest: /etc/torsocks.conf
     owner: root
-    group: tor
+    group: debian-tor
     mode: 0640
   tags: tor
   sudo: yes
+
+- name: Add HS directory
+  file:
+    path: /var/lib/tor/mylfrontend/
+    owner: debian-tor
+    group: debian-tor
+    mode: 0750
 
 - name: Allow tor on UFW
   ufw:

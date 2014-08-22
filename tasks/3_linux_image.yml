@@ -1,0 +1,71 @@
+---
+- hosts: all
+
+  tasks:
+  - name: Install linux image
+    apt:
+      pkg: linux-image-virtual
+      state: latest
+    sudo: yes
+
+  - name: Remove default grub
+    apt:
+      pkg: "{{item}}"
+      state: absent
+      purge: yes
+      force: yes
+    sudo: yes
+    with_items:
+      - grub2
+      - grub-pc
+
+  - name: Install grub
+    apt:
+      pkg: grub
+      state: latest
+    sudo: yes
+
+  - name: Add grub dir
+    file:
+      path: /boot/grub
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
+    sudo: yes
+
+  - name: Update grub
+    shell: "update-grub -y"
+    sudo: yes
+
+  - name: Get menu.lst
+    command: "cat /boot/grub/menu.lst"
+    register: menu_lst
+    sudo: yes
+
+  - debug: var=menu_lst.stdout
+
+  - name: Set up menu.lst
+    lineinfile:
+      dest: /boot/grub/menu.lst
+      state: present
+      line: "{{ item.line }}"
+      regexp: "{{ item.regexp }}"
+    sudo: yes
+    with_items:
+      - { line: '# kopt=root=/dev/xvda console=hvc0 ro', regexp: '^# kopt=' }
+      - { line: '# groot=(hd0)', regexp: '^# groot=' }
+
+  - name: Update grub
+    shell: "update-grub -y"
+    sudo: yes
+
+  - name: Get menu.lst
+    command: "cat /boot/grub/menu.lst"
+    register: menu_lst
+    sudo: yes
+
+  - debug: var=menu_lst.stdout
+
+  - debug:
+      msg: "Installed. Now go to Linode Manager -> linode -> config -> pv-grub-x86_32 / 64; root xvda; Filesystem/Boot Helpers -> Xenify distro -> disable; save profile; reboot"

@@ -67,8 +67,8 @@
 
 - name: Symlink rvm defaults to path
   file:
-    src: /usr/local/rvm/rubies/default/bin/{{item}}
-    dest: /usr/local/bin/{{item}}
+    src: "/usr/local/rvm/rubies/default/bin/{{item}}"
+    dest: "/usr/local/bin/{{item}}"
     state: link
     owner: root
     group: rvm

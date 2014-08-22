@@ -11,13 +11,30 @@
     - automysqlbackup
   sudo: yes
 
+- name: Make mysql group
+  group:
+    name: mysql
+    system: yes
+    state: present
+  sudo: yes
+
 - name: Add my.cnf
   copy:
     src: ../etc/mysql/my.cnf
     dest: /etc/mysql/my.cnf
     owner: root
-    group: root
+    group: mysql
     mode: 0600
+  tags: mysql
+  sudo: yes
+
+- name: Add tuning script
+  copy:
+    src: ../etc/mysql/tuning.sh
+    dest: /etc/mysql/tuning.sh
+    owner: root
+    group: mysql
+    mode: 0700
   tags: mysql
   sudo: yes
 
@@ -35,6 +52,19 @@
     state: started
   sudo: yes
 
+- name: Remove ipv6 and hostname root user
+  mysql_user:
+    user: 'root'
+    host: "{{item}}"
+    state: absent
+    check_implicit_admin: yes
+    login_user: root
+    login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
+  sudo: yes
+  with_items:
+    - '::1'
+    - '{{inventory_hostname}}'
+
 - name: Update mysql root password
   mysql_user:
     name: root
@@ -45,7 +75,6 @@
     login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
   with_items:
     - 127.0.0.1
-    - ::1
     - localhost
   sudo: yes
 
@@ -60,22 +89,23 @@
 - name: Ensure anonymous users are not in the database
   mysql_user:
     user: ''
-    host: "{{item}}"
+    # host: "{{item}}"
     state: absent
     login_user: root
     login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
-  with_items:
-    - 127.0.0.1
-    - ::1
-    - localhost
+  # with_items:
+  #   - 127.0.0.1
+  #   - '::1'
+  #   - localhost
+  #   - '{{inventory_hostname}}'
   sudo: yes
 
 - name: Lock down mysql executables
   file:
     dest: "/usr/bin/{{ item }}"
     owner: root
-    group: root
-    mode: 0700
+    group: mysql
+    mode: 0750
   sudo: yes
   with_items:
     - mysqladmin
@@ -106,40 +136,50 @@
     - mysql_waitpid
     - mysql_zap
 
-# - name: Add optimize user
-#   mysql_user:
-#     user: 'optimize'
-#     priv: '*.*:SELECT,INSERT'
-#     host: "{{item}}"
-#     password: "{{ lookup('file', '~/myl_sensitive/keys/database_optimize.production') }}"
-#     state: present
-#     login_user: root
-#     login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
-#   with_items:
-#     - 127.0.0.1
-#     - localhost
-#   sudo: yes
-#
-# - name: Add backup user
-#   mysql_user:
-#     user: 'backup'
-#     priv: "*.*:SELECT,RELOAD,LOCK TABLES"
-#     host: "{{item}}"
-#     password: "{{ lookup('file', '~/myl_sensitive/keys/database_backup.production') }}"
-#     state: present
-#     login_user: root
-#     login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
-#   with_items:
-#     - 127.0.0.1
-#     - localhost
-#   sudo: yes
+- name: Add local user and debian-sys-maint to mysql group
+  user:
+    name: "{{ item }}"
+    groups: mysql
+    append: yes
+  sudo: yes
+  with_items:
+    - debian-sys-maint
+    - "{{ lookup('env', 'USER') }}"
 
-- name: Add my.cnf for automatic passwords
+- name: Add optimize user
+  mysql_user:
+    user: 'optimize'
+    priv: '*.*:SELECT,INSERT'
+    host: "{{item}}"
+    password: "{{ lookup('file', '~/myl_sensitive/server/database_optimize.production') }}"
+    state: present
+    login_user: root
+    login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
+  with_items:
+    - 127.0.0.1
+    - localhost
+  sudo: yes
+
+- name: Add backup user
+  mysql_user:
+    user: 'backup'
+    priv: "*.*:SELECT,RELOAD,LOCK TABLES"
+    host: "{{item}}"
+    password: "{{ lookup('file', '~/myl_sensitive/server/database_backup.production') }}"
+    state: present
+    login_user: root
+    login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
+  with_items:
+    - 127.0.0.1
+    - localhost
+  sudo: yes
+
+- name: Add root my.cnf for backup and optimize
   template:
-    dest: /etc/my.cnf
     src: ../etc/my.cnf.j2
+    dest: /etc/my.cnf
     owner: root
-    group: root
+    group: mysql
     mode: 0600
   sudo: yes
 
@@ -147,7 +187,7 @@
   file:
     path: /root/automysqlbackup
     owner: root
-    group: root
+    group: mysql
     mode: 0600
     state: directory
   sudo: yes
@@ -157,7 +197,7 @@
     src: ../etc/default/automysqlbackup
     dest: /etc/default/automysqlbackup
     owner: root
-    group: root
+    group: mysql
     mode: 0644
   sudo: yes
 

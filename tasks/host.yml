@@ -1,6 +1,7 @@
 ---
 - name: Update hostname
-  hostname: "name={{inventory_hostname}}"
+  hostname:
+    name: "{{inventory_hostname}}"
   sudo: yes
 
 - name: Ensure hostname in /etc/hosts
@@ -21,39 +22,17 @@
     mode: 0644
   sudo: yes
 
-- name: Set root mailing aliases
-  copy:
-    src: ../etc/aliases
-    dest: /etc/aliases
-    owner: root
-    group: root
-    mode: 0644
-  sudo: yes
-
-- name: Disable IPv6
-  lineinfile:
-    state: present
-    create: yes
-    dest: /etc/sysctl.conf
-    line: "{{ item.line }}"
-    regexp: "{{ item.regexp }}"
-  sudo: yes
-  with_items:
-    - { line: "net.ipv6.conf.all.disable_ipv6 = 1", regexp: "^net.ipv6.conf.all.disable_ipv6" }
-    - { line: "net.ipv6.conf.default.disable_ipv6 = 1", regexp: "^net.ipv6.conf.default.disable_ipv6" }
-    - { line: "net.ipv6.conf.lo.disable_ipv6 = 1", regexp: "^net.ipv6.conf.lo.disable_ipv6" }
-
 - name: Reboot on out of memory
-  lineinfile:
+  sysctl:
     state: present
-    create: yes
-    dest: /etc/sysctl.conf
-    line: "{{ item.line }}"
-    regexp: "{{ item.regexp }}"
+    reload: yes
+    sysctl_set: yes
+    name: "{{ item.line }}"
+    value: "{{ item.value }}"
   sudo: yes
   with_items:
-    - { line: "vm.panic_on_oom = 1", regexp: "^vm.panic_on_oom" }
-    - { line: "kernel.panic = 10", regexp: "^kernel.panic" }
+    - { line: "vm.panic_on_oom", value: "1" }
+    - { line: "kernel.panic", value: "10" }
 
 - name: Set network interfaces
   template:
@@ -83,4 +62,3 @@
     - isc-dhcp-client
     - dhcp3-client
     - dhcpcd
-

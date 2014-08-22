@@ -16,7 +16,7 @@
 #                    MAIN CONFIGURATION SETTINGS                     #
 ######################################################################
 
-# Just for reference and scripts. 
+# Just for reference and scripts.
 # On Debian systems, the main binary is installed as exim4 to avoid
 # conflicts with the exim 3 packages.
 exim_path = /usr/sbin/exim4
@@ -64,6 +64,8 @@ qualify_domain = MAIN_QUALIFY_DOMAIN
 #.ifdef MAIN_LOCAL_INTERFACES
 #local_interfaces = MAIN_LOCAL_INTERFACES
 #.endif
+# local_interfaces = 0.0.0.0
+# no IPv6
 local_interfaces = <; ::0 ; 0.0.0.0
 
 .ifndef LOCAL_DELIVERY

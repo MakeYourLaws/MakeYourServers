@@ -19,7 +19,7 @@
   register: extras_signing_key
   sudo: yes
 
-- name: Add nginx signing key
+- name: Add extras signing key
   shell: "apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 16126D3A3E5C1192"
   when: '"no" in extras_signing_key.stdout'
   sudo: yes

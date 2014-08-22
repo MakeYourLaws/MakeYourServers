@@ -1,0 +1,74 @@
+---
+- name: Secure root home directory
+  file:
+    path: /root
+    state: directory
+    owner: root
+    group: root
+    mode: 2700
+  sudo: yes
+
+- name: Ensure permissions on system init.d files
+  file:
+    path: "/etc/init.d/{{item}}"
+    mode: 0755
+  sudo: yes
+  with_items:
+    # - cron # symlink to /lib/init/upstart-job
+    - ntp
+    - ssh
+
+- name: Ensure permissions on system init.d files added after precise
+  file:
+    path: "/etc/init.d/{{item}}"
+    mode: 0755
+  sudo: yes
+  with_items:
+    - atd
+    - acpid
+    - rsyslog
+  when: ansible_distribution_release != 'precise'
+
+- name: Lock down adduser
+  lineinfile:
+    dest: /etc/adduser.conf
+    state: present
+    line: "{{ item.line }}"
+    regexp: "{{ item.regexp }}"
+  sudo: yes
+  with_items:
+    - { line: 'SETGID_HOME=1', regexp: '^SETGID_HOME=' }
+    - { line: 'DIR_MODE=2750', regexp: '^DIR_MODE=' }
+
+- name: Install security tools
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+  sudo: yes
+  with_items:
+    - chkrootkit
+    - rkhunter
+    - tiger
+    - nmap
+
+- name: Disable ctrl alt delete
+  lineinfile:
+    dest: /etc/init/control-alt-delete.conf
+    regexp: '^[ ]*exec (.*)'
+    line: '# exec \1'
+    state: present
+  sudo: yes
+
+- name: Lock down cron
+  lineinfile:
+    dest: /etc/cron.allow
+    state: present
+    create: yes
+    line: "{{item}}"
+    owner: root
+    group: root
+    mode: 0644
+  sudo: yes
+  with_items:
+    - root
+    - "{{ lookup('env', 'USER') }}"

@@ -1,0 +1,15 @@
+---
+- name: Lock down php.ini
+  lineinfile:
+    state: present
+    create: yes
+    dest: /etc/php5/apache2/php.ini
+    line: "{{ item.line }}"
+    regexp: "{{ item.regexp }}"
+  sudo: yes
+  with_items:
+    - { line: "disable_functions = exec,system,shell_exec,passthru", regexp: "^[# ]*disable_functions" }
+    - { line: "register_globals = Off", regexp: "^[# ]*register_globals" }
+    - { line: "expose_php = Off", regexp: "^[# ]*expose_php" }
+    # Removed. http://php.net/manual/en/security.magicquotes.whynot.php
+    # - { line: "magic_quotes_gpc = On", regexp: "^[# ]*magic_quotes_gpc" }

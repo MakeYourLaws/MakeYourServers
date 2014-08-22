@@ -1,0 +1,21 @@
+---
+- name: Install logwatch
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+  sudo: yes
+  with_items:
+    - logwatch
+    - libdate-manip-perl
+
+- name: Add logwatch cron jobs
+  copy:
+    src: "..{{item}}"
+    dest: "{{item}}"
+    owner: root
+    group: root
+    mode: 0755
+  sudo: yes
+  with_items:
+    - /etc/cron.daily/00logwatch
+    - /etc/cron.weekly/00logwatch

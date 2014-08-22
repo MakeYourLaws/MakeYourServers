@@ -16,7 +16,7 @@
     state: present
     create: yes
     dest: /etc/puma.conf
-    line: "/home/mylfrontend/makeyourlaws.org/current,mylfrontend,/home/mylfrontend/makeyourlaws.org/current/config/puma/production.rb"
+    line: "/home/mylfrontend/makeyourlaws.org/current,mylfrontend,/home/mylfrontend/makeyourlaws.org/current/config/puma/production.rb,/home/mylfrontend/makeyourlaws.org/shared/log/puma_start.log"
     regexp: "^/home/mylfrontend/makeyourlaws.org"
     owner: root
     group: root

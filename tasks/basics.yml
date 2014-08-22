@@ -3,13 +3,15 @@
   apt:
     pkg: "{{ item }}"
     state: latest
+    update_cache: true
   sudo: yes
   with_items:
     - build-essential
     - gzip
-    - fail2ban
     - ipset
     - clamav
+    - clamav-freshclam
+    - clamav-docs
     - iftop
     - ntp
     - git
@@ -80,35 +82,15 @@
     - { line: 'APT::Periodic::Verbose "2";', regexp: "^APT::Periodic::Verbose" }
     - { line: 'APT::Periodic::AutocleanInterval "28";', regexp: "^APT::Periodic::AutocleanInterval"}
 
-# - name: Install logwatch
-#   action: apt pkg=logwatch state=installed
-#
-# - name: Make logwatch mail $logwatch_email daily
-#   action: lineinfile dest=/etc/cron.daily/00logwatch regexp="^/usr/sbin/logwatch" line="/usr/sbin/logwatch --output mail --mailto $logwatch_email --detail high" state=present create=yes
-
 - name: Update apt-file
   shell: "apt-file update"
   sudo: yes
 
-- name: Copy fail2ban conf
+- name: Copy update-notifier config
   copy:
-    src: ../etc/fail2ban/jail.conf
-    dest: /etc/fail2ban/jail.conf
+    src: ../usr/lib/update-notifier/update-motd-reboot-required
+    dest: /usr/lib/update-notifier/update-motd-reboot-required
     owner: root
     group: root
-    mode: 0644
-  sudo: yes
-
-- name: Ensure permissions on system init.d files
-  file:
-    path: "/etc/init.d/{{item}}"
     mode: 0755
   sudo: yes
-  with_items:
-    - atd
-    - acpid
-    # - cron # symlink to /lib/init/upstart-job
-    - ntp
-    - ssh
-    - rsyslog
-

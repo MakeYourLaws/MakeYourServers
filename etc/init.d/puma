@@ -127,12 +127,22 @@ do_restart_one() {
   dir=`echo $i | cut -d , -f 1`
 
   if [ -e $PIDFILE ]; then
+    kill -0 `cat $PIDFILE`
+    exists="$?"
+    if [ "$exists" -eq 1 ]; then
+      log_daemon_msg "--> PID `cat $PIDFILE` found but no such process exists; deleting pidfile and starting fresh."
+      rm $PIDFILE
+    fi
+  else
+    log_daemon_msg "--> PID not found. Starting fresh."
+    exists=1 # i.e. no
+  fi
+
+  if [ "$exists" -eq 0 ]; then
     log_daemon_msg "--> About to restart puma $1"
     cd $dir && /usr/local/rvm/bin/rvm default do bundle exec bin/pumactl -S $STATEFILE restart
-    # kill -s USR2 `cat $PIDFILE`
-    # TODO Check if process exist
   else
-    log_daemon_msg "--> Your puma was never playing... Let's get it out there first"
+    log_daemon_msg "--> Starting puma $1..."
     user=`echo $i | cut -d , -f 2`
     config_file=`echo $i | cut -d , -f 3`
     if [ "$config_file" = "" ]; then
@@ -144,7 +154,7 @@ do_restart_one() {
     fi
     do_start_one $dir $user $config_file $log_file
   fi
-	return 0
+  return 0
 }
 
 #
@@ -167,12 +177,20 @@ do_status_one() {
   dir=`echo $i | cut -d , -f 1`
 
   if [ -e $PIDFILE ]; then
+    kill -0 `cat $PIDFILE`
+    exists="$?"
+    if [ "$exists" -eq 1 ]; then
+      log_daemon_msg "--> $1 PID `cat $PIDFILE` found but no such process exists; deleting pidfile."
+      rm $PIDFILE
+    fi
+  else
+    log_daemon_msg "--> $1 PID not found."
+    exists=1 # i.e. no
+  fi
+
+  if [ "$exists" -eq 0 ]; then
     log_daemon_msg "--> About to status puma $1"
     cd $dir && /usr/local/rvm/bin/rvm default do bundle exec bin/pumactl -S $STATEFILE stats
-    # kill -s USR2 `cat $PIDFILE`
-    # TODO Check if process exist
-  else
-    log_daemon_msg "--> $1 isn't there :(..."
   fi
 	return 0
 }

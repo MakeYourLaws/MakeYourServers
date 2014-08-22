@@ -1,0 +1,90 @@
+---
+- name: Check tripwire lock
+  shell: 'ls /etc/tripwire/ansible_lock 2>/dev/null && echo "yes" || echo "no"'
+  register: tripwire_lock
+
+- name: Install tripwire
+  apt:
+    pkg: "{{item}}"
+    state: latest
+  sudo: yes
+  with_items:
+    - expect # needed to handle the interactive prompts so we don't put the password on command line
+    - tripwire
+  when: "'no' in tripwire_lock.stdout"
+
+- name: Add tripwire policy
+  copy:
+    src: ../etc/tripwire/twpol.txt
+    dest: /etc/tripwire/twpol.txt
+    owner: root
+    group: root
+    mode: 0640
+  sudo: yes
+  when: "'no' in tripwire_lock.stdout"
+
+- name: Set tripwire policy
+  command: twadmin -m P -Q '' /etc/tripwire/twpol.txt # Installed with no password by default
+  sudo: yes
+  when: "'no' in tripwire_lock.stdout"
+
+- name: Initiate tripwire database
+  command: tripwire --init -P ''
+  sudo: yes
+  when: "'no' in tripwire_lock.stdout"
+
+- name: Check tripwire
+  command: tripwire --check
+  sudo: yes
+  register: tripwire_results
+
+- debug: var=tripwire_results.stdout_lines
+
+- set_fact:
+      tripwire_local_password_file: "~/myl_sensitive/server/tripwire.localkey.{{inventory_hostname}}"
+
+# Must be separated
+- set_fact:
+      tripwire_local_password: "{{lookup('file', tripwire_local_password_file)}}"
+      tripwire_site_password: "{{lookup('file', '~/myl_sensitive/server/tripwire.sitekey')}}"
+
+- name: Copy tripwire passphrase changers
+  template:
+    src: "../etc/tripwire/tw_change_{{item}}_pw.expect.j2"
+    dest: "/etc/tripwire/tw_change_{{item}}_pw.expect"
+    owner: root
+    group: root
+    mode: 0500
+  sudo: yes
+  with_items:
+    - site
+    - local
+  when: "'no' in tripwire_lock.stdout"
+
+- name: Secure tripwire keys
+  shell: "/etc/tripwire/{{item}}"
+  sudo: yes
+  with_items:
+    - tw_change_site_pw.expect
+    - tw_change_local_pw.expect
+  when: "'no' in tripwire_lock.stdout"
+
+- name: Delete passphrase changers
+  file:
+    path: "/etc/tripwire/tw_change_{{item}}_pw.expect"
+    state: absent
+  sudo: yes
+  with_items:
+    - site
+    - local
+  when: "'no' in tripwire_lock.stdout"
+
+- name: Set tripwire lock
+  file:
+    path: "/etc/tripwire/ansible_lock"
+    state: touch
+    owner: root
+    group: root
+    mode: 0400
+  sudo: yes
+  when: "'no' in tripwire_lock.stdout"

@@ -1,4 +1,5 @@
 DKIM_CANNON = relaxed
 DKIM_DOMAIN = $sender_address_domain
-DKIM_PRIVATE_KEY = CONFDIR/narn.dkim.private.key
+DKIM_PRIVATE_KEY = /etc/exim4/narn.dkim.private.key
 DKIM_SELECTOR = narn
+# MAIN_HARDCODE_PRIMARY_HOSTNAME = makeyourlaws.org

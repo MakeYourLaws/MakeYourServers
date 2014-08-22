@@ -49,7 +49,7 @@
   user:
     name: mylfrontend
     shell: "/bin/bash"
-    groups: "mylfrontend,users,rvm"
+    groups: "sshlogin,rvm"
     group: mylfrontend
     password: "{{ lookup('file', '~/myl_sensitive/server/mylfrontend_mylfrontend_password_crypted.txt') }}"
     state: present
@@ -70,5 +70,15 @@
     state: directory
     owner: mylfrontend
     group: mylfrontend
-    mode: 0751
+    mode: 2751
+  sudo: yes
+
+- name: Make permissions sticky
+  shell: 'getfacl --access /home/mylfrontend/ | setfacl -d -M- /home/mylfrontend/'
+  sudo: yes
+
+- name: Allow UFW web
+  ufw:
+    rule: allow
+    name: web
   sudo: yes

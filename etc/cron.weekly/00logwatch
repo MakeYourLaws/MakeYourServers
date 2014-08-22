@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#Check if removed-but-not-purged
+test -x /usr/share/logwatch/scripts/logwatch.pl || exit 0
+
+#execute
+# /usr/sbin/logwatch --output mail
+
+/usr/sbin/logwatch --output mail --mailto makeyourlaws+logwatch.weekly@saizai.com --detail high --format html --range 'between -7 days and today'

@@ -1,0 +1,37 @@
+---
+- name: Install fail2ban
+  apt:
+    pkg: fail2ban
+    state: latest
+    update_cache: true
+  sudo: yes
+
+- name: Copy fail2ban conf
+  copy:
+    src: ../etc/fail2ban/jail.conf
+    dest: /etc/fail2ban/jail.conf
+    owner: root
+    group: root
+    mode: 0644
+  sudo: yes
+
+- name: Restart fail2ban
+  service:
+    name: fail2ban
+    state: restarted
+  sudo: yes
+
+- name: Symlink fail2ban monit files
+  file:
+    src: /etc/monit/monitrc.d/fail2ban
+    dest: /etc/monit/conf.d/fail2ban
+    state: link
+    owner: root
+    group: root
+  sudo: yes
+
+- name: Reload monit
+  service:
+    name: monit
+    state: reloaded
+  sudo: yes

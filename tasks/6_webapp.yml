@@ -5,7 +5,9 @@
     - include: linode_facts.yml
     - include: myl_frontend_pre.yml
     # - include: deploy.yml
-    - include: myl_frontend_post.yml
+    # - include: myl_frontend_post.yml
     # - include: tor.yml
     # - include: app_user.yml
     # - include: app.yml
+
+# TODO: logrotate, tripwire

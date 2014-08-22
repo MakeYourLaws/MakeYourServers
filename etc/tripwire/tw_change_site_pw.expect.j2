@@ -1,0 +1,14 @@
+#!/usr/bin/expect
+
+spawn sudo twadmin -m C -S /etc/tripwire/site.key
+
+expect "Enter the old site keyfile passphrase:"
+send "\r"
+
+expect "Enter the site keyfile passphrase:"
+send "{{ tripwire_site_password }}\r"
+
+expect "Verify the site keyfile passphrase:"
+send "{{ tripwire_site_password }}\r"
+
+expect eof

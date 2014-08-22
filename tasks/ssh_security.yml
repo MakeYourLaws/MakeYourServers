@@ -1,0 +1,44 @@
+---
+- name: Make sshlogin group
+  group:
+    name: sshlogin
+    state: present
+  sudo: yes
+
+- name: Add local user to sshlogin group
+  user:
+    name: "{{ lookup('env', 'USER') }}"
+    groups: sshlogin
+    append: yes
+  sudo: yes
+
+- name: Lock down SSH
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    state: present
+    line: "{{ item.line }}"
+    regexp: "{{ item.regexp }}"
+  with_items:
+    # Disable insecure things
+    - { line: "X11Forwarding no", regexp: "^[# ]*X11Forwarding"}
+    - { line: "PermitEmptyPasswords no", regexp: "^[# ]*PermitEmptyPasswords" }
+    - { line: "PermitRootLogin no", regexp: "^[# ]*PermitRootLogin" }
+    - { line: "ChallengeResponseAuthentication no", regexp: "^[# ]*ChallengeResponseAuthentication."}
+    - { line: "HostbasedAuthentication no", regexp: "^[# ]*HostbasedAuthentication"}
+    - { line: "PasswordAuthentication no", regexp: "^[# ]*PasswordAuthentication"}
+    - { line: "IgnoreRhosts yes", regexp: "^[# ]*IgnoreRhosts"}
+    - { line: "IgnoreUserKnownHosts yes", regexp: "^[# ]*IgnoreUserKnownHosts"}
+    - { line: "RhostsRSAAuthentication no", regexp: "^[# ]*RhostsRSAAuthentication"}
+    # Allow secure auth
+    - { line: "PubkeyAuthentication yes", regexp: "^[# ]*PubkeyAuthentication"}
+    - { line: "RSAAuthentication yes", regexp: "^[# ]*RSAAuthentication"}
+    - { line: "UsePAM yes", regexp: "^[# ]*UsePAM" }
+    # And add further lockdowns
+    - { line: "PrintMotd yes", regexp: "^[# ]*PrintMotd" }
+    - { line: "PrintLastLog yes", regexp: "^[# ]*PrintLastLog" }
+    - { line: "AllowGroups sshlogin", regexp: "^[# ]*AllowGroups"}
+    - { line: "StrictModes yes", regexp: "^[# ]*StrictModes" }
+    - { line: "UsePrivilegeSeparation yes", regexp: "^[# ]*UsePrivilegeSeparation" }
+    - { line: "LogLevel VERBOSE", regexp: "^[# ]*LogLevel"}
+  sudo: yes
+  notify: Restart ssh

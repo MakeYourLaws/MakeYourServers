@@ -7,7 +7,7 @@
     owner: root
     group: root
   sudo: yes
-  tags: exim4
+  tags: mail
   with_items:
     - exim
     - sasl
@@ -18,4 +18,4 @@
     name: monit
     state: reloaded
   sudo: yes
-  tags: exim4
+  tags: mail

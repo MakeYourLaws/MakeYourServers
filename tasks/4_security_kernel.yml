@@ -1,0 +1,8 @@
+---
+- hosts: all
+
+  # Requires standard (not Linode) linux kernel installed so apparmor is available
+
+  tasks:
+  - include: apparmor.yml
+  - include: tripwire.yml

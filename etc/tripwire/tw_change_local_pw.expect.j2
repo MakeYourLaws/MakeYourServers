@@ -1,0 +1,14 @@
+#!/usr/bin/expect
+
+spawn sudo twadmin -m C -L /etc/tripwire/{{inventory_hostname}}-local.key
+
+expect "Enter the old local keyfile passphrase:"
+send "\r"
+
+expect "Enter the local keyfile passphrase:"
+send "{{ tripwire_local_password }}\r"
+
+expect "Verify the local keyfile passphrase:"
+send "{{ tripwire_local_password }}\r"
+
+expect eof

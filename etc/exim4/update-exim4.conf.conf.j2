@@ -17,7 +17,8 @@
 # This is a Debian specific file
 
 dc_eximconfig_configtype='internet'
-dc_other_hostnames='mylfrontend.makeyourlaws.org;makeyourlaws.org;mail.makeyourlaws.org'
+dc_other_hostnames='makeyourlaws.org;{{inventory_hostname}}.makeyourlaws.org'
+# dc_local_interfaces='0.0.0.0'
 dc_local_interfaces='127.0.0.1 ; ::1'
 dc_readhost=''
 dc_relay_domains=''
@@ -25,6 +26,7 @@ dc_minimaldns='false'
 dc_relay_nets=''
 dc_smarthost=''
 CFILEMODE='644'
+# CFILEMODE='640'
 dc_use_split_config='true'
 dc_hide_mailname=''
 dc_mailname_in_oh='true'

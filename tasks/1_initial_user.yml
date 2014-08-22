@@ -1,6 +1,8 @@
 ---
 - hosts: all
   remote_user: root
+  ask_pass: True
+  ask_sudo_pass: False
 
   vars:
     local_user: "{{ lookup('env', 'USER') }}"
@@ -29,21 +31,17 @@
         user: "{{ local_user }}"
         key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 
-    - name: Disallow root SSH access
-      action: lineinfile dest=/etc/ssh/sshd_config regexp="^PermitRootLogin" line="PermitRootLogin no" state=present
-      notify: Restart ssh
-
-    - name: Disallow password authentication
-      action: lineinfile dest=/etc/ssh/sshd_config regexp="^PasswordAuthentication" line="PasswordAuthentication no" state=present
-      notify: Restart ssh
-
     - name: Secure home directory
       file:
         path: "/home/{{ local_user }}/"
         state: directory
         owner: "{{local_user}}"
         group: "{{local_user}}"
-        mode: 0750
+        mode: 2750
+
+    - name: Make permissions sticky
+      command: "getfacl --access /home/{{ local_user }}/ | setfacl -d -M- /home/{{ local_user }}/"
+      sudo: yes
 
     - name: Copy dotfiles
       copy:
@@ -54,7 +52,3 @@
         mode: 0640
       with_fileglob:
         - ../dotfiles/.*
-
-  handlers:
-  - name: Restart ssh
-    action: service name=ssh state=restarted

@@ -34,13 +34,14 @@
     rule: deny
   sudo: yes
 
-- name: Allow UFW web
+- name: Log and limit ssh
   ufw:
-    rule: allow
-    name: web
+    rule: limit
+    port: ssh  # not the applications.d openssh
+    log: yes
   sudo: yes
 
-- name: Log and limit UFW applications
+- name: Log and limit exim4 mutt and mosh
   ufw:
     rule: limit
     name: "{{ item }}"
@@ -51,18 +52,16 @@
     - monit
     - mosh
 
-- name: Log and limit UFW applications
-  ufw:
-    rule: limit
-    port: ssh  # not the applications.d openssh
-    log: yes
-  sudo: yes
-
 - name: Enable UFW with default deny incoming
   ufw:
     state: enabled
     direction: incoming
     policy: deny
+  sudo: yes
+
+- name: Turn on UFW logging
+  ufw:
+    logging: 'on'
   sudo: yes
 
 - name: Symlink ufw monit
