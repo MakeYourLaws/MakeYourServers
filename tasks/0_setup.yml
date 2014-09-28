@@ -1,0 +1,31 @@
+# 0. create new linode
+# 1. settings -> label - rename to something nice
+# 2. add that label & the IP to your /etc/hosts
+# 3. add DNS:
+  # MX  mailserver: [label].[yourdomain.com]  subdomain: [label]
+  # A hostname: [label]  IP: [server ip]
+  # TXT name: [label] value: v=spf1 a -all
+  # TXT name: _domainkey.[label]  value: o=-; r=email@for.dmarc.reports.com
+  # TXT name: [dkimlabel]._domainkey.[label]  value: v=DKIM1; k=rsa; p=[public dkim key]
+    # generate DKIM keys via:
+    # openssl genrsa -out [label].dkim.private.key 1024 -outform PEM
+    # openssl rsa -in [label].dkim.private.key -out [label].dkim.public.key -pubout -outform PEM
+    # use the text part of the public key (onelined) in p= above
+# 4. remote access -> reverse dns -> [label].[yourdomain.com]  - note: may have to wait for DNS from #3 to propagate; can do this later
+# 5. remote access -> add private ip
+# 6. add backups
+# 7. create new disk image
+  # a. swap / swap / 2048 MB  [for 2048MB linode]
+  # b. [label] / ext4 / [max size]
+# 8. deploy linux distribution
+  # ubuntu 14.04 LTS, 47104 MB [for 2048mb linode]; max swap; root password [something secure]
+# 9. edit swap image to same size as ram [2048mb]
+# 10. edit config. profile:
+  # kernel: latest 64 bit (note: this will change to grub in step 3)
+  # /dev/xvda: [label]
+  # /dev/xvdb: swap
+  # Disable updatedb: no
+# 11. boot!
+
+
+# Now onto:  ansible-playbook -l [label] tasks/1_initial_user.yml
