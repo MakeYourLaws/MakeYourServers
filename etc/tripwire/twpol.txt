@@ -209,6 +209,7 @@ SIG_HI        = 100 ;                # Critical files that are
 	# /root/.Xresources		-> $(SEC_CONFIG) ;
 	# /root/.Xauthority		-> $(SEC_CONFIG) -i ; # Changes Inode number on login
 	# /root/.ICEauthority		    -> $(SEC_CONFIG) ;
+	/root/.config/htop  -> $(SEC_CONFIG) ;
 }
 
 #
@@ -221,7 +222,7 @@ SIG_HI        = 100 ;                # Critical files that are
 {
 	/dev		-> $(Device) ;
 	/dev/xvda	-> $(Device) ;
-	/dev/pts	-> $(Device) ;
+	# /dev/pts	-> $(Device) ;
 	# /proc		-> $(Device) ;
 	/proc/buddyinfo           	-> $(Device) ;
 	/proc/bus                 	-> $(Device) ;
