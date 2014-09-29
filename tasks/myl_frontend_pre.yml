@@ -56,6 +56,15 @@
   sudo: yes
   tags: mylfrontend
 
+- name: Give mylfrontend limited sudo access
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    line: "%mylfrontend ALL = NOPASSWD:NOEXEC:NOSETENV: /usr/sbin/service mylfrontend_resque start, /usr/sbin/service mylfrontend_resque stop, /usr/sbin/service mylfrontend_resque graceful_stop, /usr/sbin/service mylfrontend_resque quick_stop, /usr/sbin/service mylfrontend_resque reload, /usr/sbin/service mylfrontend_resque restart, /usr/sbin/service mylfrontend_resque status, /usr/sbin/service mylfrontend_resque_scheduler status, /usr/sbin/service mylfrontend_resque_scheduler start, /usr/sbin/service mylfrontend_resque_scheduler stop, /usr/sbin/service mylfrontend_resque_scheduler restart, /usr/sbin/service puma start /home/mylfrontend/makeyourlaws.org, /usr/sbin/service puma stop /home/mylfrontend/makeyourlaws.org, /usr/sbin/service puma status /home/mylfrontend/makeyourlaws.org, /usr/sbin/service puma restart /home/mylfrontend/makeyourlaws.org"
+    regexp: "^%mylfrontend "
+    validate: 'visudo -cf %s'
+  sudo: yes
+
 - name: "Add authorized_key for mylfrontend user"
   authorized_key:
     user: "mylfrontend"
