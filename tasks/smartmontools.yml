@@ -10,7 +10,7 @@
 - name: Ensure permissions on smartmontools init.d file
   file:
     path: "/etc/init.d/smartmontools"
-    mode: 0755
+    mode: '0755'
   sudo: yes
 
 - name: Copy smartmon config
@@ -19,7 +19,7 @@
     dest: "{{item}}"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   sudo: yes
   with_items:
     - "/etc/smartd.conf"

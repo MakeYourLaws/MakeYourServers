@@ -20,7 +20,7 @@
     state: directory
     owner: root
     group: ssl
-    mode: 0755
+    mode: '0755'
   sudo: yes
   tags: ssl
 
@@ -30,7 +30,7 @@
     dest: /etc/ssl/localcerts/
     owner: root
     group: ssl
-    mode: 0440
+    mode: '0440'
   tags: ssl
   sudo: yes
   with_fileglob:
@@ -48,7 +48,7 @@
     dest: /etc/ssl/localcerts/
     owner: root
     group: ssl
-    mode: 0444
+    mode: '0444'
   tags: ssl
   sudo: yes
   with_fileglob:
@@ -57,7 +57,7 @@
 - name: Make monit cert no more than 0700
   file:
     path: /etc/ssl/localcerts/monit.pem
-    mode: 0400
+    mode: '0400'
   tags: ssl
   sudo: yes
 

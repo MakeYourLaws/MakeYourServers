@@ -5,13 +5,23 @@
     state: directory
     owner: root
     group: root
-    mode: 2700
+    mode: '2700'
   sudo: yes
+
+- name: Copy root dotfiles
+  copy:
+    src: "{{item}}"
+    dest: /root
+    owner: root
+    group: root
+    mode: '0640'
+  with_fileglob:
+    - ../dotfiles/.*
 
 - name: Ensure permissions on system init.d files
   file:
     path: "/etc/init.d/{{item}}"
-    mode: 0755
+    mode: '0755'
   sudo: yes
   with_items:
     # - cron # symlink to /lib/init/upstart-job
@@ -21,11 +31,11 @@
 - name: Ensure permissions on system init.d files added after precise
   file:
     path: "/etc/init.d/{{item}}"
-    mode: 0755
+    mode: '0755'
   sudo: yes
   with_items:
     - atd
-    - acpid
+    # - acpid
     - rsyslog
   when: ansible_distribution_release != 'precise'
 
@@ -67,7 +77,7 @@
     line: "{{item}}"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   sudo: yes
   with_items:
     - root

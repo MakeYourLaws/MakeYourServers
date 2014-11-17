@@ -4,7 +4,7 @@
     dest: /usr/local/bin/run-puma
     owner: root
     group: root
-    mode: 0755
+    mode: '0755'
   tags: puma
   sudo: yes
 
@@ -14,7 +14,7 @@
     dest: /etc/init.d/puma
     owner: root
     group: root
-    mode: 0755
+    mode: '0755'
   tags: puma
   sudo: yes
 

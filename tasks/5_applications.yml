@@ -1,7 +1,7 @@
 ---
 - hosts: all
 
-# ~/.chube should have:
+# local ~/.chube should have:
 #
 # ---
 # api_key: linode_api_key_here
@@ -14,11 +14,11 @@
   # - include: rvm.yml
   # - include: ruby.yml
   # - include: gems.yml
-  # - include: smartmontools.yml # only on non-virtual server
-  - include: mysql.yml # TODO: fix automysqlbackup & mysqloptimize
-  - include: redis.yml
-  - include: geoip.yml
-  # - include: nginx.yml
+  ## - include: smartmontools.yml # only on non-virtual server
+  # - include: mysql.yml # TODO: fix automysqlbackup & mysqloptimize
+  # - include: redis.yml
+  # - include: geoip.yml
+  - include: nginx.yml
   # - include: puma.yml
 
   handlers:

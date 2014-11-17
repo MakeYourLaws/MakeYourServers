@@ -38,7 +38,7 @@
     dest: /etc/mailname
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   sudo: yes
   tags: mail
 
@@ -48,7 +48,7 @@
     dest: /etc/aliases
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   sudo: yes
 
 - name: Add exim4 config
@@ -57,7 +57,7 @@
     dest: "/etc/exim4/{{item}}"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   tags: mail
   sudo: yes
   with_items:
@@ -74,7 +74,7 @@
     dest: /etc/exim4/update-exim4.conf.conf
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   tags: mail
   sudo: yes
 
@@ -84,7 +84,7 @@
     dest: /etc/Muttrc
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   tags: mail
   sudo: yes
 
@@ -94,7 +94,7 @@
     dest: /root/.muttrc
     owner: root
     group: root
-    mode: 0640
+    mode: '0640'
   tags: mail
   sudo: yes
 
@@ -104,20 +104,21 @@
     dest: "{{item}}"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   tags: mail
   sudo: yes
   with_items:
     - /etc/opendkim.conf
     - /etc/default/saslauthd
 
+# TODO: limit to certs used on this server
 - name: Add exim4 certs
   copy:
     src: "{{item}}"
     dest: /etc/exim4/
     owner: root
     group: Debian-exim
-    mode: 0440
+    mode: '0440'
   tags: mail
   sudo: yes
   with_fileglob:
@@ -129,7 +130,7 @@
     dest: /etc/exim4/passwd
     owner: root
     group: Debian-exim
-    mode: 0640
+    mode: '0640'
   tags: mail
   sudo: yes
 
@@ -139,7 +140,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: '0755'
   sudo: yes
   tags: mail
 
@@ -150,7 +151,7 @@
 #     recurse: yes
 #     owner: Debian-exim
 #     group: Debian-exim
-#     mode: 0751
+#     mode: '0751'
 #   sudo: yes
 #   tags: mail
 #   with_items:

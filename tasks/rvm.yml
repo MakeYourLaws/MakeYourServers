@@ -9,13 +9,20 @@
   apt: pkg=git state=latest update_cache=yes
   sudo: yes
 
+- name: Make rvm group
+  group:
+    name: rvm
+    system: yes
+    state: present
+  sudo: yes
+
 - name: Install gemrc and rvmrc
   copy:
     src: "../etc/{{item}}"
     dest: "../etc/{{item}}"
     owner: root
     group: rvm
-    mode: 0644
+    mode: '0644'
   sudo: yes
   with_items:
     - rvmrc
@@ -64,40 +71,6 @@
   register: new_rvm_version
 
 - debug: var=new_rvm_version.stdout
-
-- name: Symlink rvm defaults to path
-  file:
-    src: "/usr/local/rvm/rubies/default/bin/{{item}}"
-    dest: "/usr/local/bin/{{item}}"
-    state: link
-    owner: root
-    group: rvm
-  with_items:
-    - erb
-    - gem
-    - irb
-    - rake
-    - rbx
-    - ri
-    - ruby
-    - testrb
-  sudo: yes
-
-- name: Get gem version
-  shell: gem -v
-  register: gem_version
-
-- debug: var=gem_version.stdout
-
-- name: Update rubygems
-  shell: gem update --system
-  sudo: yes
-
-- name: Get gem version
-  shell: gem -v
-  register: gem_version
-
-- debug: var=gem_version.stdout
 
 - name: Ensure local user is in rvm group
   user:

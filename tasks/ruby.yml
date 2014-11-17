@@ -23,3 +23,37 @@
   shell: "rvm alias create default rbx-{{latest_rbx_version.stdout}}"
   sudo: yes
   when: latest_rbx_version.stdout.find('.') != -1
+
+- name: Symlink rvm defaults to path
+  file:
+    src: "/usr/local/rvm/rubies/default/bin/{{item}}"
+    dest: "/usr/local/bin/{{item}}"
+    state: link
+    owner: root
+    group: rvm
+  with_items:
+    - erb
+    - gem
+    - irb
+    - rake
+    - rbx
+    - ri
+    - ruby
+    - testrb
+  sudo: yes
+
+- name: Get gem version
+  shell: gem -v
+  register: gem_version
+
+- debug: var=gem_version.stdout
+
+- name: Update rubygems
+  shell: gem update --system
+  sudo: yes
+
+- name: Get gem version
+  shell: gem -v
+  register: gem_version
+
+- debug: var=gem_version.stdout

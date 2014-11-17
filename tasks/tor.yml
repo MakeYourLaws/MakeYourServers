@@ -12,7 +12,7 @@
     dest: /etc/apt/sources.list.d/tor.list
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   tags: tor
   sudo: yes
 
@@ -33,7 +33,7 @@
     dest: /etc/tor/torrc
     owner: root
     group: debian-tor
-    mode: 0640
+    mode: '0640'
   tags: tor
   sudo: yes
 
@@ -43,7 +43,7 @@
     dest: /etc/tor/tor-tsocks.conf
     owner: root
     group: debian-tor
-    mode: 0640
+    mode: '0640'
   tags: tor
   sudo: yes
 
@@ -53,7 +53,7 @@
     dest: /etc/torsocks.conf
     owner: root
     group: debian-tor
-    mode: 0640
+    mode: '0640'
   tags: tor
   sudo: yes
 
@@ -62,7 +62,7 @@
     path: /var/lib/tor/mylfrontend/
     owner: debian-tor
     group: debian-tor
-    mode: 0750
+    mode: '0750'
 
 - name: Allow tor on UFW
   ufw:

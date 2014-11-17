@@ -19,7 +19,7 @@
     dest: /etc/tripwire/twpol.txt
     owner: root
     group: root
-    mode: 0640
+    mode: '0640'
   sudo: yes
   when: "'no' in tripwire_lock.stdout"
 
@@ -54,7 +54,7 @@
     dest: "/etc/tripwire/tw_change_{{item}}_pw.expect"
     owner: root
     group: root
-    mode: 0500
+    mode: '0500'
   sudo: yes
   with_items:
     - site
@@ -85,6 +85,6 @@
     state: touch
     owner: root
     group: root
-    mode: 0400
+    mode: '0400'
   sudo: yes
   when: "'no' in tripwire_lock.stdout"

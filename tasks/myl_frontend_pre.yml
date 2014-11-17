@@ -1,41 +1,41 @@
 ---
-- name: Add myl_production DB
-  mysql_db:
-    name: myl_production
-    state: present
-    login_user: root
-    login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
-  sudo: yes
-  tags: mylfrontend
-
-- name: Add mysql user
-  mysql_user:
-    user: myl_production
-    host: "{{ item }}"
-    password: "{{ lookup('file', '~/myl_sensitive/keys/database.production') }}"
-    priv: "myl_production.*:ALL"
-    login_user: root
-    login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
-  sudo: yes
-  tags: mylfrontend
-  with_items:
-    - 127.0.0.1
-    - localhost
-
-- name: Add mylfrontend group
-  group:
-    name: mylfrontend
-    state: present
-  sudo: yes
-  tags: mylfrontend
-
-- name: Add local user to mylfrontend group
-  user:
-    name: "{{ lookup('env', 'USER') }}"
-    groups: mylfrontend
-    append: yes
-  sudo: yes
-  tags: mylfrontend
+# - name: Add myl_production DB
+#   mysql_db:
+#     name: myl_production
+#     state: present
+#     login_user: root
+#     login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
+#   sudo: yes
+#   tags: mylfrontend
+#
+# - name: Add mysql user
+#   mysql_user:
+#     user: myl_production
+#     host: "{{ item }}"
+#     password: "{{ lookup('file', '~/myl_sensitive/keys/database.production') }}"
+#     priv: "myl_production.*:ALL"
+#     login_user: root
+#     login_password: "{{ lookup('file', '~/myl_sensitive/server/mysql_root_password.txt') }}"
+#   sudo: yes
+#   tags: mylfrontend
+#   with_items:
+#     - 127.0.0.1
+#     - localhost
+#
+# - name: Add mylfrontend group
+#   group:
+#     name: mylfrontend
+#     state: present
+#   sudo: yes
+#   tags: mylfrontend
+#
+# - name: Add local user to mylfrontend group
+#   user:
+#     name: "{{ lookup('env', 'USER') }}"
+#     groups: mylfrontend
+#     append: yes
+#   sudo: yes
+#   tags: mylfrontend
 
 - name: Add nginx to mylfrontend group
   user:
@@ -44,50 +44,50 @@
     append: yes
   sudo: yes
   tags: mylfrontend
-
-- name: "Create mylfrontend user"
-  user:
-    name: mylfrontend
-    shell: "/bin/bash"
-    groups: "sshlogin,rvm"
-    group: mylfrontend
-    password: "{{ lookup('file', '~/myl_sensitive/server/mylfrontend_mylfrontend_password_crypted.txt') }}"
-    state: present
-  sudo: yes
-  tags: mylfrontend
-
-- name: Give mylfrontend limited sudo access
-  lineinfile:
-    dest: /etc/sudoers
-    state: present
-    line: "%mylfrontend ALL = NOPASSWD:NOEXEC:NOSETENV: /usr/sbin/service mylfrontend_resque start, /usr/sbin/service mylfrontend_resque stop, /usr/sbin/service mylfrontend_resque graceful_stop, /usr/sbin/service mylfrontend_resque quick_stop, /usr/sbin/service mylfrontend_resque reload, /usr/sbin/service mylfrontend_resque restart, /usr/sbin/service mylfrontend_resque status, /usr/sbin/service mylfrontend_resque_scheduler status, /usr/sbin/service mylfrontend_resque_scheduler start, /usr/sbin/service mylfrontend_resque_scheduler stop, /usr/sbin/service mylfrontend_resque_scheduler restart, /usr/sbin/service puma start /home/mylfrontend/makeyourlaws.org, /usr/sbin/service puma stop /home/mylfrontend/makeyourlaws.org, /usr/sbin/service puma status /home/mylfrontend/makeyourlaws.org, /usr/sbin/service puma restart /home/mylfrontend/makeyourlaws.org"
-    regexp: "^%mylfrontend "
-    validate: 'visudo -cf %s'
-  sudo: yes
-
-- name: "Add authorized_key for mylfrontend user"
-  authorized_key:
-    user: "mylfrontend"
-    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
-  sudo: yes
-  tags: mylfrontend
-
-
-- name: Secure mylfrontend directory
-  file:
-    path: "/home/mylfrontend/"
-    state: directory
-    owner: mylfrontend
-    group: mylfrontend
-    mode: 2751
-  sudo: yes
-
-- name: Make permissions sticky
-  shell: 'getfacl --access /home/mylfrontend/ | setfacl -d -M- /home/mylfrontend/'
-  sudo: yes
-
-- name: Allow UFW web
-  ufw:
-    rule: allow
-    name: web
-  sudo: yes
+#
+# - name: "Create mylfrontend user"
+#   user:
+#     name: mylfrontend
+#     shell: "/bin/bash"
+#     groups: "sshlogin,rvm"
+#     group: mylfrontend
+#     password: "{{ lookup('file', '~/myl_sensitive/server/mylfrontend_mylfrontend_password_crypted.txt') }}"
+#     state: present
+#   sudo: yes
+#   tags: mylfrontend
+#
+# - name: Give mylfrontend limited sudo access
+#   lineinfile:
+#     dest: /etc/sudoers
+#     state: present
+#     line: "%mylfrontend ALL = NOPASSWD: /usr/sbin/service mylfrontend_resque start, /usr/sbin/service mylfrontend_resque stop, /usr/sbin/service mylfrontend_resque graceful_stop, /usr/sbin/service mylfrontend_resque quick_stop, /usr/sbin/service mylfrontend_resque reload, /usr/sbin/service mylfrontend_resque restart, /usr/sbin/service mylfrontend_resque status, /usr/sbin/service mylfrontend_resque_scheduler status, /usr/sbin/service mylfrontend_resque_scheduler start, /usr/sbin/service mylfrontend_resque_scheduler stop, /usr/sbin/service mylfrontend_resque_scheduler restart, /usr/sbin/service puma start /home/mylfrontend/makeyourlaws.org, /usr/sbin/service puma stop /home/mylfrontend/makeyourlaws.org, /usr/sbin/service puma status /home/mylfrontend/makeyourlaws.org, /usr/sbin/service puma restart /home/mylfrontend/makeyourlaws.org"
+#     regexp: "^%mylfrontend "
+#     validate: 'visudo -cf %s'
+#   sudo: yes
+#
+# - name: "Add authorized_key for mylfrontend user"
+#   authorized_key:
+#     user: "mylfrontend"
+#     key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+#   sudo: yes
+#   tags: mylfrontend
+#
+#
+# - name: Secure mylfrontend directory
+#   file:
+#     path: "/home/mylfrontend/"
+#     state: directory
+#     owner: mylfrontend
+#     group: mylfrontend
+#     mode: '2751'
+#   sudo: yes
+#
+# - name: Make permissions sticky
+#   shell: 'getfacl --access /home/mylfrontend/ | setfacl -d -M- /home/mylfrontend/'
+#   sudo: yes
+#
+# - name: Allow UFW web
+#   ufw:
+#     rule: allow
+#     name: web
+#   sudo: yes

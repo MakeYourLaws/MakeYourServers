@@ -29,6 +29,7 @@
     - apticron
     - curl
     - gawk
+    - landscape-common
     # - autoconf
     # - automake
     # - bison
@@ -54,7 +55,7 @@
     dest: /etc/apticron/apticron.conf
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   sudo: yes
 
 - name: Copy unattended-upgrades config
@@ -63,7 +64,7 @@
     dest: /etc/apt/apt.conf.d/50unattended-upgrades
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   sudo: yes
 
 - name: Enable unattended-upgrades
@@ -92,5 +93,5 @@
     dest: /usr/lib/update-notifier/update-motd-reboot-required
     owner: root
     group: root
-    mode: 0755
+    mode: '0755'
   sudo: yes

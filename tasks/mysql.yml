@@ -24,7 +24,7 @@
     dest: /etc/mysql/my.cnf
     owner: root
     group: mysql
-    mode: 0600
+    mode: '0600'
   tags: mysql
   sudo: yes
 
@@ -34,7 +34,7 @@
     dest: /etc/mysql/tuning.sh
     owner: root
     group: mysql
-    mode: 0700
+    mode: '0700'
   tags: mysql
   sudo: yes
 
@@ -45,6 +45,16 @@
     append: yes
   sudo: yes
   tags: mysql
+
+- name: Delete logfiles to fix innodb different size issue
+  file:
+    dest: "{{item}}"
+    state: absent
+  sudo: yes
+  tags: mysql
+  with_items:
+    - /var/lib/mysql/ib_logfile0
+    - /var/lib/mysql/ib_logfile1
 
 - name: Start the MySQL service
   service:
@@ -105,7 +115,7 @@
     dest: "/usr/bin/{{ item }}"
     owner: root
     group: mysql
-    mode: 0750
+    mode: '0750'
   sudo: yes
   with_items:
     - mysqladmin
@@ -180,7 +190,7 @@
     dest: /etc/my.cnf
     owner: root
     group: mysql
-    mode: 0600
+    mode: '0600'
   sudo: yes
 
 - name: Add automysqlbackup folder
@@ -188,7 +198,7 @@
     path: /root/automysqlbackup
     owner: root
     group: mysql
-    mode: 0600
+    mode: '0600'
     state: directory
   sudo: yes
 
@@ -198,7 +208,7 @@
     dest: /etc/default/automysqlbackup
     owner: root
     group: mysql
-    mode: 0644
+    mode: '0644'
   sudo: yes
 
 # - name: Add mysql daily backup
@@ -207,7 +217,7 @@
 #     dest: /etc/cron.daily/automysqlbackup
 #     owner: root
 #     group: root
-#     mode: 0755
+#     mode: '0755'
 #   sudo: yes
 
 # - name: Add mysql weekly optimize
@@ -216,8 +226,19 @@
 #     dest: /etc/cron.weekly/mysqloptimize
 #     owner: root
 #     group: root
-#     mode: 0755
+#     mode: '0755'
 #   sudo: yes
+
+# TODO: only if new install
+- name: Delete logfiles to fix innodb different size issue
+  file:
+    dest: "{{item}}"
+    state: absent
+  sudo: yes
+  tags: mysql
+  with_items:
+    - /var/lib/mysql/ib_logfile0
+    - /var/lib/mysql/ib_logfile1
 
 # TODO: Only if my.cnf, root p/w, test db, or anon users have changed
 - name: Restart the MySQL service

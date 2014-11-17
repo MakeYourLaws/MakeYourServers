@@ -19,7 +19,7 @@
     dest: /etc/default/locale
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   sudo: yes
 
 - name: Reboot on out of memory
@@ -40,7 +40,7 @@
     src: ../etc/network/interfaces.j2
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   sudo: yes
 
 - name: Check if both IPs are up

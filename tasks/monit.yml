@@ -12,7 +12,7 @@
     dest: /etc/monit/monitrc
     owner: root
     group: root
-    mode: 0600
+    mode: '0600'
   tags: monit
   sudo: yes
 
@@ -22,7 +22,7 @@
     dest: /etc/monit/monitrc.d/
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   tags: monit
   sudo: yes
   with_fileglob:
@@ -34,7 +34,7 @@
     dest: /etc/monit/ufw_check.sh
     owner: root
     group: root
-    mode: 0754
+    mode: '0754'
   tags: monit
   sudo: yes
 
@@ -66,7 +66,7 @@
     group: root
   sudo: yes
   with_items:
-    - atd
+    - at
     - acpid
     - rsyslog
   when: ansible_distribution_release != 'precise'

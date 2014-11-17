@@ -1,11 +1,60 @@
 ---
+- name: Secure mylfrontend shared directories
+  file:
+    path: "/home/mylfrontend/makeyourlaws.org/shared/{{item}}"
+    state: directory
+    owner: mylfrontend
+    group: mylfrontend
+    mode: '2751'
+  sudo: yes
+  with_items:
+    - bin
+    - bundle
+    - config
+    - db
+    - log
+    - tmp
+    - tmp/cache
+    - tmp/pids
+    - vendor
+    - vendor/bundle
+
+- name: Secure mylfrontend public and sockets directories
+  file:
+    path: "/home/mylfrontend/makeyourlaws.org/shared/{{item}}"
+    state: directory
+    owner: mylfrontend
+    group: mylfrontend
+    mode: '2755'
+  sudo: yes
+  with_items:
+    - tmp/sockets
+    - public
+
+- name: Make permissions sticky
+  shell: 'getfacl --access /home/mylfrontend/makeyourlaws.org/shared/{{item}} | setfacl -d -M- /home/mylfrontend/makeyourlaws.org/shared/{{item}}'
+  sudo: yes
+  with_items:
+    - bin
+    - bundle
+    - config
+    - db
+    - log
+    - tmp
+    - tmp/cache
+    - tmp/pids
+    - tmp/sockets
+    - vendor
+    - vendor/bundle
+    - public
+
 - name: Add MYL frontend init.d files
   copy:
     src: "{{item}}"
     dest: /etc/init.d/
     owner: root
     group: root
-    mode: 0755
+    mode: '0755'
   tags: mylfrontend
   sudo: yes
   with_fileglob:
@@ -20,7 +69,7 @@
     regexp: "^/home/mylfrontend/makeyourlaws.org"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   sudo: yes
   tags: mylfrontend
 
@@ -30,7 +79,7 @@
     dest: "/etc/nginx/sites-available/{{item}}.conf"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   tags: nginx
   sudo: yes
   with_items:
@@ -45,7 +94,7 @@
     state: link
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   tags: mylfrontend
   sudo: yes
   with_items:

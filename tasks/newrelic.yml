@@ -23,7 +23,7 @@
     dest: /etc/apt/sources.list.d/newrelic.list
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   sudo: yes
   tags: newrelic
 
@@ -40,7 +40,7 @@
     state: directory
     owner: root
     group: newrelic
-    mode: 0770
+    mode: '0770'
   sudo: yes
   with_items:
     - /var/run/newrelic
@@ -54,7 +54,7 @@
     dest: /etc/newrelic/nrsysmond.cfg
     owner: root
     group: newrelic
-    mode: 0640
+    mode: '0640'
   sudo: yes
   tags: newrelic
 
