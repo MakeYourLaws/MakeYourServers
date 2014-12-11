@@ -1,5 +1,6 @@
 #!/bin/bash
 app=$1; statefile=$2; log=$3; cmd=$4;
-# Formerly 2>&1 >> $log, but that didn't actually capture all output.
-echo "controlling puma as `whoami`: cd $app && bundle exec pumactl -S $statefile $cmd &>> $log" >> $log
-cd $app && /usr/local/rvm/bin/rvm default do bundle exec pumactl -S $statefile $cmd &>> $log
+echo "controlling puma as `whoami`: (cd $app && /usr/local/rvm/bin/rvm default do bundle exec pumactl -S $statefile $cmd 2>&1) | tee -a $log" >> $log
+# Formerly 2>&1 >> $log, but that didn't actually capture all output; then &>> $log;
+#  now (... 2&>1) | tee -a $log
+(cd $app && /usr/local/rvm/bin/rvm default do bundle exec pumactl -S $statefile $cmd 2>&1) | tee -a $log

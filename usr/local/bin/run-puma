@@ -1,5 +1,6 @@
 #!/bin/bash
 app=$1; config=$2; log=$3;
-# Formerly 2>&1 >> $log, but that didn't actually capture all output.
-echo "starting puma as `whoami`: cd $app && bundle exec puma -C $config &>> $log" >> $log
-cd $app && /usr/local/rvm/bin/rvm default do bundle exec puma -C $config &>> $log
+# Formerly 2>&1 >> $log, but that didn't actually capture all output; then &>> $log;
+#  now (... 2&>1) | tee -a $log
+echo "starting puma as `whoami`: (cd $app && /usr/local/rvm/bin/rvm default do bundle exec puma -C $config 2>&1) | tee -a $log" >> $log
+(cd $app && /usr/local/rvm/bin/rvm default do bundle exec puma -C $config 2>&1) | tee -a $log
