@@ -1,12 +1,15 @@
-- name: Add run-puma
+- name: Add run-puma and ctl-puma
   copy:
-    src: ../usr/local/bin/run-puma
-    dest: /usr/local/bin/run-puma
+    src: ../usr/local/bin/{{item}}
+    dest: /usr/local/bin/{{item}}
     owner: root
     group: root
     mode: '0755'
   tags: puma
   sudo: yes
+  with_items:
+    - run-puma
+    - ctl-puma
 
 - name: Add puma init.d
   copy:

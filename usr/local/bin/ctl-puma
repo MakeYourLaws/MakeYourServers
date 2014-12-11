@@ -1,0 +1,5 @@
+#!/bin/bash
+app=$1; statefile=$2; log=$3; cmd=$4;
+# Formerly 2>&1 >> $log, but that didn't actually capture all output.
+echo "controlling puma as `whoami`: cd $app && bundle exec pumactl -S $statefile $cmd &>> $log" >> $log
+cd $app && /usr/local/rvm/bin/rvm default do bundle exec pumactl -S $statefile $cmd &>> $log

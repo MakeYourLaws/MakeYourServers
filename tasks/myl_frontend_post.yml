@@ -19,7 +19,7 @@
     - vendor
     - vendor/bundle
 
-- name: Secure mylfrontend public and sockets directories
+- name: Secure mylfrontend public directory
   file:
     path: "/home/mylfrontend/makeyourlaws.org/shared/{{item}}"
     state: directory
@@ -28,8 +28,18 @@
     mode: '2755'
   sudo: yes
   with_items:
-    - tmp/sockets
     - public
+
+- name: Secure mylfrontend socket directory
+  file:
+    path: "/home/mylfrontend/makeyourlaws.org/shared/{{item}}"
+    state: directory
+    owner: mylfrontend
+    group: mylfrontend
+    mode: '2770'
+  sudo: yes
+  with_items:
+    - tmp/sockets
 
 - name: Make permissions sticky
   shell: 'getfacl --access /home/mylfrontend/makeyourlaws.org/shared/{{item}} | setfacl -d -M- /home/mylfrontend/makeyourlaws.org/shared/{{item}}'

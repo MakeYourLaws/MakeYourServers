@@ -1,4 +1,14 @@
 ---
+- name: Check if rvm gpg key present
+  shell: "gpg --list-keys D39DC0E3 && echo 'yes' || echo 'no'"
+  sudo: yes
+  register: rvm_gpg_installed
+
+- name: Install rvm gpg key
+  shell: "gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3"
+  sudo: yes
+  when: '"no" in rvm_gpg_installed.stdout'
+
 - name: Check if rvm installed
   shell: "ls /usr/local/rvm/bin/rvm && echo 'yes' || echo 'no'"
   register: rvm_installed
@@ -51,7 +61,7 @@
   sudo: yes
 
 - name: Get rvm version
-  shell: 'rvm -v | grep -Eo "rvm (.*) \(stable\)" | grep -Eo "[0-9.]+"'
+  shell: 'rvm -v | grep -Eo "rvm (.*) \([a-z]+\)" | grep -Eo "[0-9.]+"'
   register: rvm_version
 
 - name: Get latest rvm version
@@ -67,7 +77,7 @@
   when: '"yes" in rvm_installed.stdout and latest_rvm_version.stdout != rvm_version.stdout'
 
 - name: Get rvm version
-  shell: 'rvm -v | grep -Eo "rvm (.*) \(stable\)" | grep -Eo "[0-9.]+"'
+  shell: 'rvm -v | grep -Eo "rvm (.*) \([a-z]+\)" | grep -Eo "[0-9.]+"'
   register: new_rvm_version
 
 - debug: var=new_rvm_version.stdout
