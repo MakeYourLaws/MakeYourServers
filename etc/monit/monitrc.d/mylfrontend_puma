@@ -1,8 +1,27 @@
- check process puma with pidfile /home/mylfrontend/makeyourlaws.org/shared/tmp/pids/puma.pid
-   group puma
-   group mylfrontend
-   start program = "/usr/sbin/service puma start /home/mylfrontend/makeyourlaws.org"
-   stop  program = "/usr/sbin/service puma stop /home/mylfrontend/makeyourlaws.org"
-   if 5 restarts within 5 cycles then timeout
-   depends on puma_rc
+check process puma with pidfile /home/mylfrontend/makeyourlaws.org/shared/tmp/pids/puma.pid
+  group puma
+  group mylfrontend
+  start program = "/usr/sbin/service puma start /home/mylfrontend/makeyourlaws.org/current/"
+  stop  program = "/usr/sbin/service puma stop /home/mylfrontend/makeyourlaws.org/current/"
+  if 5 restarts within 5 cycles then timeout
+  depends on puma_rc
 
+check host makeyourlaws.org with address makeyourlaws.org
+  group puma
+  group mylfrontend
+  if failed port 443 type tcpssl and protocol http
+#    http headers [Host: makeyourlaws.org, Cache-Control: no-cache]
+    request "/"
+    with timeout 5 seconds
+  then restart
+  if 5 restarts within 5 cycles then timeout
+  depends on puma_rc
+
+#check program puma_status with path "/usr/sbin/service puma status /home/mylfrontend/makeyourlaws.org/current"
+#  group puma
+#  group mylfrontend
+#  start program = "/usr/sbin/service puma start /home/mylfrontend/makeyourlaws.org/current/"
+#  stop  program = "/usr/sbin/service puma stop /home/mylfrontend/makeyourlaws.org/current/"
+#  if 5 restarts within 5 cycles then timeout
+#  if status != 0 then restart
+#  depends on puma_rc

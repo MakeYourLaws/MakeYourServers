@@ -1,3 +1,11 @@
- check file puma_rc with path /etc/init.d/puma
-   group puma
-   include /etc/monit/templates/rootbin
+check file puma_rc with path /etc/init.d/puma
+  group puma
+  include /etc/monit/templates/rootbin
+
+check file ctl-puma with path /usr/local/bin/ctl-puma
+  group puma
+  include /etc/monit/templates/rootbin
+
+check file run-puma with path /usr/local/bin/ctl-puma
+  group puma
+  include /etc/monit/templates/rootbin

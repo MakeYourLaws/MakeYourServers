@@ -1,7 +1,6 @@
 ---
 - name: Check latest rbx version
-  shell: 'echo "2.3.0"' # Overriding due to openssl dependency through rubysl-openssl
-  # shell: 'rvm list known | grep "rbx\[-" | sed -E "s/[^0-9.]//g"'
+  shell: 'rvm list known | grep "rbx\[-" | sed -E "s/[^0-9.]//g"'
   register: latest_rbx_version
 
 - name: Check current rbx version
