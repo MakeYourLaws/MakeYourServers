@@ -1,0 +1,9 @@
+/home/mylfrontend/makeyourlaws.org/shared/log/*.log {
+	compress
+	copytruncate
+	daily
+	delaycompress
+	missingok
+	rotate 30
+	su mylfrontend mylfrontend
+}

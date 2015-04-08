@@ -51,11 +51,49 @@
     - /etc/nginx/
     - /var/log/nginx/
 
-- name: Install nginx
+- name: Install mod_pagespeed prereqs
   apt:
-    pkg: nginx
+    pkg: "{{ item }}"
     state: latest
   sudo: yes
+  with_items:
+    - build-essential
+    - zlib1g-dev
+    - libpcre3
+    - libpcre3-dev
+    - unzip
+    - libpcrecpp0
+    - libssl-dev
+    - zlib1g-dev
+
+
+# - name: Uninstall nginx
+#   apt:
+#     pkg: nginx
+#     state: absent
+#   sudo: yes
+
+
+- name: Add build_nginx.sh
+  copy:
+    src: ../root/build_nginx.sh
+    dest: /root/build_nginx.sh
+    owner: root
+    group: root
+    mode: '0700'
+  tags: nginx
+  sudo: yes
+
+- name: Install nginx
+  shell: "/root/build_nginx.sh"
+  tags: nginx
+  sudo: yes
+
+# - name: Install nginx
+#   apt:
+#     pkg: nginx
+#     state: latest
+#   sudo: yes
 
 - name: Add nginx.conf
   copy:

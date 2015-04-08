@@ -24,3 +24,7 @@
   handlers:
   - name: Restart ssh
     action: service name=ssh state=restarted
+
+  vars:
+    nginx_page_speed_version: "1.9.32.3"
+    nginx_version: "1.6.2"
