@@ -1,4 +1,5 @@
-root: makeyourlaws@saizai.com
+root: no-reply@makeyourlaws.org
+core: root
 clamav: root
 monit: root
 postmaster: root
