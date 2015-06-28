@@ -6,4 +6,4 @@ test -x /usr/share/logwatch/scripts/logwatch.pl || exit 0
 #execute
 # /usr/sbin/logwatch --output mail
 
-/usr/sbin/logwatch --output mail --mailto makeyourlaws+logwatch.daily@saizai.com --detail high --format html --range 'between -1 days and today'
+/usr/sbin/logwatch --output mail --mailto debug+logwatch.daily@makeyourlaws.org --detail high --format html --range 'between -1 days and today'

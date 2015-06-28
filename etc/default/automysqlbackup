@@ -45,7 +45,7 @@ MAILCONTENT="stdout"
 MAXATTSIZE="4000"
 
 # Email Address to send mail to? (user@domain.com)
-MAILADDR="makeyourlaws+mysqlbackup@saizai.com"
+MAILADDR="debug+mysqlbackup@makeyourlaws.org"
 
 # ============================================================
 # === ADVANCED OPTIONS ( Read the doc's below for details )===
